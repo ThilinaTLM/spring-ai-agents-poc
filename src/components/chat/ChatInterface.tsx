@@ -98,7 +98,7 @@ export function ChatInterface() {
             {isTyping && (
               <div className="flex gap-3 px-4 py-3 md:px-6 md:py-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <Avatar className="size-8 md:size-9 shrink-0 mr-2">
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary/90 text-white text-xs font-semibold shadow-lg">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold shadow-lg">
                     AI
                   </AvatarFallback>
                 </Avatar>

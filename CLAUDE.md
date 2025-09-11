@@ -95,13 +95,15 @@ npx shadcn@latest add card
 ```
 
 The project is configured with:
+
 - **Style**: New York
 - **Base color**: Zinc
 - **CSS variables**: Enabled
 - **Icon library**: Lucide React
 
 # important-instruction-reminders
+
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.

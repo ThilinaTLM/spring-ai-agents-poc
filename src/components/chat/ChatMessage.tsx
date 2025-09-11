@@ -36,8 +36,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
           className={cn(
             'text-xs font-semibold transition-colors duration-200',
             isUser
-              ? 'bg-gradient-to-br from-chart-2 to-chart-2/90 text-white shadow-lg'
-              : 'bg-gradient-to-br from-primary to-primary/90 text-white shadow-lg',
+              ? 'bg-chart-2 text-background shadow-lg'
+              : 'bg-primary text-primary-foreground shadow-lg',
           )}
         >
           {isUser ? 'U' : 'AI'}
@@ -71,8 +71,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
           className={cn(
             'relative rounded-2xl px-4 py-3 max-w-full shadow-sm transition-all duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-primary/20',
             isUser
-              ? 'bg-gradient-to-br from-chart-2 to-chart-2/90 text-white rounded-br-md'
-              : 'bg-card border border-border rounded-bl-md',
+              ? 'bg-chart-2 text-background rounded-br-md'
+              : 'bg-card border text-foreground/80 border-border rounded-bl-md',
           )}
           role="article"
           aria-label={`Message from ${isUser ? 'you' : 'assistant'}`}
@@ -81,7 +81,9 @@ export function ChatMessage({ message }: ChatMessageProps) {
           <div
             className={cn(
               'prose prose-sm max-w-none',
-              isUser ? 'prose-invert [&>p]:text-white' : 'dark:prose-invert',
+              isUser
+                ? 'prose-invert [&>p]:text-background'
+                : 'dark:prose-invert',
             )}
           >
             <p className="whitespace-pre-wrap leading-relaxed m-0 text-sm md:text-base">
@@ -94,7 +96,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             className={cn(
               'absolute top-4 w-3 h-3 transform rotate-45',
               isUser
-                ? '-right-1 bg-gradient-to-br from-chart-2 to-chart-2/90'
+                ? '-right-1 bg-chart-2'
                 : '-left-1 bg-card border-l border-b border-border',
             )}
           />

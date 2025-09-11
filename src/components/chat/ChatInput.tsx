@@ -92,7 +92,7 @@ export function ChatInput({
               aria-describedby="input-help"
               className={cn(
                 'min-h-[40px] max-h-[160px] resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent',
-                'placeholder:text-muted-foreground/70 text-sm md:text-base',
+                'placeholder:text-muted-foreground/70 text-foreground text-sm md:text-base',
               )}
               rows={1}
             />
