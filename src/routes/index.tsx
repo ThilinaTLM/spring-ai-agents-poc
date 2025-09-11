@@ -8,12 +8,12 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+        <h1 className="text-4xl font-bold text-foreground mb-4">
           Spring Agent POC
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+        <p className="text-lg text-muted-foreground mb-8">
           Welcome to your TanStack Start application with AI Chat!
         </p>
         <Button asChild size="lg">

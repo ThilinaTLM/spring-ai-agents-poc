@@ -83,13 +83,13 @@ export function ChatInterface() {
         <div className="flex items-center justify-center px-4 md:px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="size-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+              <div className="size-10 bg-gradient-to-br from-primary to-chart-2 rounded-full flex items-center justify-center shadow-lg">
                 <MessageCircle className="size-5 text-white" />
               </div>
-              <div className="absolute -bottom-1 -right-1 size-4 bg-green-500 border-2 border-background rounded-full animate-pulse" />
+              <div className="absolute -bottom-1 -right-1 size-4 bg-chart-4 border-2 border-background rounded-full animate-pulse" />
             </div>
             <div>
-              <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
                 AI Chat Assistant
               </h1>
               <p className="text-xs text-muted-foreground">
@@ -117,7 +117,7 @@ export function ChatInterface() {
             {isTyping && (
               <div className="flex gap-3 px-4 py-3 md:px-6 md:py-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <Avatar className="size-8 md:size-9 shrink-0 mr-2">
-                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-purple-600 text-white text-xs font-semibold shadow-lg">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary/90 text-white text-xs font-semibold shadow-lg">
                     AI
                   </AvatarFallback>
                 </Avatar>
@@ -132,7 +132,7 @@ export function ChatInterface() {
                   </div>
                   <div className="relative rounded-2xl rounded-bl-md px-4 py-3 bg-card border border-border shadow-sm">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="size-4 text-purple-500 animate-pulse" />
+                      <Sparkles className="size-4 text-primary animate-pulse" />
                       <div className="flex gap-1">
                         <div className="size-2 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:0ms]"></div>
                         <div className="size-2 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:150ms]"></div>

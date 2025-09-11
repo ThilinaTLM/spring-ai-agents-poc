@@ -36,8 +36,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
           className={cn(
             'text-xs font-semibold transition-colors duration-200',
             isUser
-              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg'
-              : 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg',
+              ? 'bg-gradient-to-br from-chart-2 to-chart-2/90 text-white shadow-lg'
+              : 'bg-gradient-to-br from-primary to-primary/90 text-white shadow-lg',
           )}
         >
           {isUser ? 'U' : 'AI'}
@@ -71,7 +71,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
           className={cn(
             'relative rounded-2xl px-4 py-3 max-w-full shadow-sm transition-all duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-primary/20',
             isUser
-              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-md'
+              ? 'bg-gradient-to-br from-chart-2 to-chart-2/90 text-white rounded-br-md'
               : 'bg-card border border-border rounded-bl-md',
           )}
           role="article"
@@ -94,7 +94,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             className={cn(
               'absolute top-4 w-3 h-3 transform rotate-45',
               isUser
-                ? '-right-1 bg-gradient-to-br from-blue-500 to-blue-600'
+                ? '-right-1 bg-gradient-to-br from-chart-2 to-chart-2/90'
                 : '-left-1 bg-card border-l border-b border-border',
             )}
           />
