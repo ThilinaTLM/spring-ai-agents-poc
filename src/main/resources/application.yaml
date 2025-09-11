@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: api
+  datasource:
+    url: ${database.uri}
+    username: ${database.username}
+    password: ${database.password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${keycloak.server-url}/realms/${keycloak.realm}
+          jwk-set-uri: ${keycloak.server-url}/realms/${keycloak.realm}/protocol/openid-connect/certs
+
+keycloak:
+  server-url: ${keycloak.server-url}
+  realm: ${keycloak.realm}
+  client-id: ${keycloak.client-id}
+  client-secret: ${keycloak.client-secret}
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /docs/api
+  show-actuator: false
+
+google:
+  cloud:
+    chat:
+      model-name: "gemini-2.5-flash"
+      temperature: 0.2
+      max-tokens: 2048
+    project-id: ${google.cloud.project-id}
+    location: ${google.cloud.location}
+    credentials: ${google.cloud.credentials}
