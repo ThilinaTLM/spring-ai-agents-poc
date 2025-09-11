@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChatMessage } from './ChatMessage'
 import { ChatInput } from './ChatInput'
+import { ChatHeader } from './ChatHeader'
 import type { Message } from './ChatMessage'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { MessageCircle, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 
 const SAMPLE_RESPONSES = [
   "I'm here to help! What would you like to know?",
@@ -78,27 +79,7 @@ export function ChatInterface() {
 
   return (
     <div className="w-full flex flex-col h-screen bg-background">
-      {/* Enhanced Header */}
-      <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
-        <div className="flex items-center justify-center px-4 md:px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="size-10 bg-gradient-to-br from-primary to-chart-2 rounded-full flex items-center justify-center shadow-lg">
-                <MessageCircle className="size-5 text-white" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 size-4 bg-chart-4 border-2 border-background rounded-full animate-pulse" />
-            </div>
-            <div>
-              <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
-                AI Chat Assistant
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                Always ready to help
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ChatHeader />
 
       {/* Messages Area */}
       <div className="w-full max-w-7xl mx-auto flex-1 overflow-hidden">

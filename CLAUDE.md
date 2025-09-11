@@ -6,25 +6,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Development server (runs on port 3000)
-npm run dev
+pnpm run dev
 
 # Build for production
-npm run build
+pnpm run build
 
 # Start production server
-npm run start
+pnpm run start
 
 # Run tests
-npm run test
+pnpm run test
 
 # Linting and formatting
-npm run lint
-npm run format
-npm run check  # Format + lint fix
+pnpm run lint
+pnpm run format
+pnpm run check  # Format + lint fix
 
 # Preview production build
-npm run serve
+pnpm run serve
 ```
+
+## Package Manager
+
+This project uses **pnpm** as the package manager. Use pnpm commands rather than npm or yarn.
 
 ## Project Architecture
 
@@ -60,7 +64,9 @@ This is a **Spring Agent POC web application** built with the TanStack ecosystem
 ### Component Architecture
 
 - UI components in `src/components/ui/` (Shadcn/ui with Radix primitives)
-- Demo components co-located with routes in `src/routes/demo.*/`
+- Chat components in `src/components/chat/` (ChatInterface, ChatMessage, etc.)
+- Provider components in `src/components/providers/` (Theme, Query)
+- Common components in `src/components/common/` (shared UI elements)
 - Custom hooks in `src/hooks/`
 - Utilities in `src/lib/`
 
@@ -78,3 +84,24 @@ This is a **Spring Agent POC web application** built with the TanStack ecosystem
 - Component composition with headless UI
 - Mock data generation with Faker.js for demos
 - Integrated DevTools for Router and Query debugging
+
+## Adding Shadcn Components
+
+Add new UI components using the Shadcn CLI:
+
+```bash
+npx shadcn@latest add button
+npx shadcn@latest add card
+```
+
+The project is configured with:
+- **Style**: New York
+- **Base color**: Zinc
+- **CSS variables**: Enabled
+- **Icon library**: Lucide React
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
