@@ -56,7 +56,7 @@ export function ChatInput({
   const canSend = message.trim() && !disabled
 
   return (
-    <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 p-3 md:p-4">
+    <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 p-3 md:p-4">
       <div className="mx-auto max-w-4xl">
         <div
           className={cn(

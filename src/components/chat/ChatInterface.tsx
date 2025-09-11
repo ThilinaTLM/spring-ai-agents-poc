@@ -4,7 +4,7 @@ import { ChatInput } from './ChatInput'
 import type { Message } from './ChatMessage'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { MessageCircle, Zap, Sparkles } from 'lucide-react'
+import { MessageCircle, Sparkles } from 'lucide-react'
 
 const SAMPLE_RESPONSES = [
   "I'm here to help! What would you like to know?",
@@ -77,9 +77,9 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="w-full flex flex-col h-screen bg-background">
       {/* Enhanced Header */}
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
+      <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
         <div className="flex items-center justify-center px-4 md:px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -101,7 +101,7 @@ export function ChatInterface() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="w-full max-w-7xl mx-auto flex-1 overflow-hidden">
         <ScrollArea ref={scrollAreaRef} className="h-full">
           <div className="min-h-full pb-4">
             {messages.map((message, index) => (
