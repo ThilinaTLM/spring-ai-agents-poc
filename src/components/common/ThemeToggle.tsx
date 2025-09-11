@@ -7,25 +7,19 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
 
   const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark')
-    } else if (theme === 'dark') {
-      setTheme('system')
-    } else {
-      setTheme('light')
-    }
+    setTheme(theme === 'light' ? 'dark' : 'light')
   }
 
   const getIcon = () => {
-    if (theme === 'light') return <Sun className="size-4" />
-    if (theme === 'dark') return <Moon className="size-4" />
-    return <Sun className="size-4" /> // system defaults to sun icon
+    return theme === 'light' ? (
+      <Sun className="size-4" />
+    ) : (
+      <Moon className="size-4" />
+    )
   }
 
   const getTitle = () => {
-    if (theme === 'light') return 'Switch to dark mode'
-    if (theme === 'dark') return 'Switch to system mode'
-    return 'Switch to light mode'
+    return theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'
   }
 
   return (
@@ -34,7 +28,7 @@ export function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       title={getTitle()}
-      className="size-9 hover:bg-accent/50"
+      className="size-9 bg-accent/30 hover:bg-accent/70 text-foreground"
     >
       {getIcon()}
       <span className="sr-only">Toggle theme</span>

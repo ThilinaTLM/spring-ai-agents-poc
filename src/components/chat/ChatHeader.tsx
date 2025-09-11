@@ -5,6 +5,7 @@ export function ChatHeader() {
   return (
     <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
       <div className="flex items-center justify-between px-4 md:px-6 py-4">
+        <div className="flex-1" />
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="size-10 bg-primary rounded-full flex items-center justify-center shadow-lg">
@@ -21,7 +22,9 @@ export function ChatHeader() {
             </p>
           </div>
         </div>
-        <ThemeToggle />
+        <div className="flex-1 flex justify-end">
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   )
