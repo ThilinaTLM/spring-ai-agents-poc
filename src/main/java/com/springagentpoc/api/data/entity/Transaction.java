@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "transactions", indexes = {
-        @Index(name = "idx_transaction_user", columnList = "user_id"),
         @Index(name = "idx_transaction_created", columnList = "created_at"),
         @Index(name = "idx_transaction_status", columnList = "status"),
         @Index(name = "idx_transaction_reference", columnList = "reference_id")
@@ -24,9 +23,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
-
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
 
     @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;

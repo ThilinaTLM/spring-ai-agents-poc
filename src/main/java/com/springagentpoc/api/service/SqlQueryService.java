@@ -37,6 +37,7 @@ public class SqlQueryService {
                     "(/\\*.*?\\*/)",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL
     );
+
     private final JdbcTemplate jdbcTemplate;
 
     @Tool(description = """
@@ -46,7 +47,6 @@ public class SqlQueryService {
             
             1. transactions table:
                - id (UUID): Primary key
-               - user_id (UUID): User who initiated the transaction  
                - amount (DECIMAL): Transaction amount in USD
                - type (VARCHAR): DEBIT, CREDIT, TRANSFER, REFUND
                - status (VARCHAR): PENDING, COMPLETED, FAILED, CANCELLED
@@ -57,7 +57,6 @@ public class SqlQueryService {
             
             2. conversations table:
                - id (UUID): Primary key
-               - user_id (UUID): User who owns the conversation
                - title (VARCHAR): Conversation title
                - created_at (TIMESTAMP): When conversation was created
                - updated_at (TIMESTAMP): When conversation was last updated
