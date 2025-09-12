@@ -22,9 +22,7 @@ public class ChatService {
 
     private final ChatModel chatModel;
     private final PostgresChatMemory chatMemory;
-    private final TransactionService transactionService;
-    private final TransactionAnalyticsService transactionAnalyticsService;
-    private final TransactionInsightsService transactionInsightsService;
+    private final SqlQueryService sqlQueryService;
 
     public String chatWithMemory(String userPrompt, UUID userId, UUID conversationId) {
         log.debug("Processing chat with memory for conversation: {}", conversationId);
@@ -42,16 +40,37 @@ public class ChatService {
                 - Professional and trustworthy - users rely on you for important financial decisions
                 - Clear communicator - explain complex financial concepts in simple, jargon-free language
                 - Proactive and insightful - don't just answer questions, provide valuable observations
-                - Data-driven - base recommendations on actual transaction analysis using your tools
+                - Data-driven - base recommendations on actual transaction analysis using SQL queries
                 - Privacy-conscious - treat all financial information with utmost confidentiality
                 
-                Available Tools:
-                You have access to comprehensive transaction analysis tools including income/expense tracking,
-                cash flow analysis, spending categorization, unusual transaction detection, recurring pattern
-                analysis, and duplicate detection. Use these tools proactively to provide thorough analysis.
+                Database Schema & Query Tool:
+                You have access to a SQL query tool that can execute SELECT queries against the transaction database.
+                Use SQL queries to analyze user financial data and provide insights.
+                
+                Database Tables:
+                1. transactions table:
+                   - id (UUID): Primary key
+                   - user_id (UUID): User who initiated the transaction
+                   - amount (DECIMAL): Transaction amount in USD
+                   - type (VARCHAR): DEBIT, CREDIT, TRANSFER, REFUND
+                   - status (VARCHAR): PENDING, COMPLETED, FAILED, CANCELLED
+                   - description (TEXT): Transaction description/memo
+                   - reference_id (VARCHAR): External reference or merchant ID
+                   - created_at (TIMESTAMP): When transaction was created
+                   - updated_at (TIMESTAMP): When transaction was last updated
+                
+                Common Analysis Examples:
+                - Total income: SELECT SUM(amount) FROM transactions WHERE type = 'CREDIT' AND status = 'COMPLETED' AND user_id = 'USER_ID'
+                - Monthly spending: SELECT DATE_TRUNC('month', created_at) as month, SUM(amount) FROM transactions WHERE type = 'DEBIT' AND user_id = 'USER_ID' GROUP BY month ORDER BY month
+                - Spending by category (extract from description): SELECT COUNT(*), AVG(amount) FROM transactions WHERE description ILIKE '%restaurant%' AND type = 'DEBIT'
+                - Cash flow analysis: SELECT type, SUM(amount) FROM transactions WHERE status = 'COMPLETED' AND user_id = 'USER_ID' GROUP BY type
+                - Unusual transactions: SELECT * FROM transactions WHERE amount > (SELECT AVG(amount) * 3 FROM transactions WHERE user_id = 'USER_ID') AND user_id = 'USER_ID'
+                - Peak spending times: SELECT EXTRACT(hour FROM created_at) as hour, COUNT(*) FROM transactions WHERE type = 'DEBIT' GROUP BY hour ORDER BY COUNT(*) DESC
                 
                 Guidelines:
-                - Always analyze the data before making recommendations
+                - Always use SQL queries to analyze the actual transaction data before making recommendations
+                - When filtering by user, always include user_id in WHERE clauses for privacy
+                - Use appropriate date ranges and filters based on the user's questions
                 - Provide specific, actionable advice based on the user's actual financial patterns
                 - Highlight both positive trends and areas for improvement
                 - Be encouraging while being realistic about financial challenges
@@ -71,13 +90,11 @@ public class ChatService {
                     .prompt()
                     .messages(messages)
                     .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(conversationId.toString()).build())
-                    .tools(transactionService, transactionAnalyticsService, transactionInsightsService)
+                    .tools(sqlQueryService)
                     .call()
                     .content();
 
             assert response != null;
-            // Note: MessageChatMemoryAdvisor automatically handles message storage
-            // Removed manual chatMemory.add() call to prevent duplicate storage
 
             log.debug("Generated AI response with memory and tools");
             return response;

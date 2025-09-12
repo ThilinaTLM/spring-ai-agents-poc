@@ -13,17 +13,17 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Table(name = "messages", 
-       indexes = {
-        @Index(name = "idx_message_conversation", columnList = "conversation_id"),
-        @Index(name = "idx_message_created", columnList = "created_at"),
-        @Index(name = "idx_message_role", columnList = "role"),
-        @Index(name = "idx_message_content_hash", columnList = "content_hash")
-       },
-       uniqueConstraints = {
-        @UniqueConstraint(name = "uk_message_conversation_hash", 
-                         columnNames = {"conversation_id", "content_hash", "role"})
-       })
+@Table(name = "messages",
+        indexes = {
+                @Index(name = "idx_message_conversation", columnList = "conversation_id"),
+                @Index(name = "idx_message_created", columnList = "created_at"),
+                @Index(name = "idx_message_role", columnList = "role"),
+                @Index(name = "idx_message_content_hash", columnList = "content_hash")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_message_conversation_hash",
+                        columnNames = {"conversation_id", "content_hash", "role"})
+        })
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

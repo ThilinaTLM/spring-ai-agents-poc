@@ -1,7 +1,10 @@
 package com.springagentpoc.api.net.http;
 
 import com.springagentpoc.api.annotation.UserId;
-import com.springagentpoc.api.models.dto.*;
+import com.springagentpoc.api.models.dto.ChatMessageDto;
+import com.springagentpoc.api.models.dto.ChatMessageFormDto;
+import com.springagentpoc.api.models.dto.ConversationDto;
+import com.springagentpoc.api.models.dto.StartConversationFormDto;
 import com.springagentpoc.api.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
