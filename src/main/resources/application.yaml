@@ -16,6 +16,9 @@ spring:
         jwt:
           issuer-uri: ${keycloak.server-url}/realms/${keycloak.realm}
           jwk-set-uri: ${keycloak.server-url}/realms/${keycloak.realm}/protocol/openid-connect/certs
+  ai:
+    model:
+      chat: none
 
 keycloak:
   server-url: ${keycloak.server-url}
