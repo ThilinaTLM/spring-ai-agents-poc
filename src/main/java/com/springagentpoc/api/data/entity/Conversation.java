@@ -24,11 +24,10 @@ public class Conversation {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
-    @Column(name = "title", length = 255)
+    @Column(name = "title")
     private String title;
 
     @Enumerated(EnumType.STRING)

@@ -14,7 +14,7 @@ public class DocsController {
 
     @GetMapping("/ui")
     public void renderHtml(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String title = "Mint - API Reference";
+        String title = "SpringAgentic - API Reference";
         String scheme = getScheme(request);
         String serverName = request.getServerName();
         String serverPort =

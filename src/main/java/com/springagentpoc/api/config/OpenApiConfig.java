@@ -20,7 +20,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(title = "Mint API", version = "0.1.0", description = "API for Mint Application"),
+        info = @Info(title = "SpringAgentic PoC API", version = "0.1.0", description = "API for SpringAgentic PoC"),
         security = {
                 @SecurityRequirement(
                         name = "oauth2",
