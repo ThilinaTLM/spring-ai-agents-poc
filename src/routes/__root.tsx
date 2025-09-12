@@ -1,11 +1,9 @@
 import {
-  HeadContent,
   Scripts,
   createRootRouteWithContext,
   Link,
 } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import appCss from '../styles.css?url'
 
 export const Route = createRootRouteWithContext()({
   head: () => ({
@@ -19,12 +17,6 @@ export const Route = createRootRouteWithContext()({
       },
       {
         title: 'SpringAgentic PoC',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
       },
     ],
   }),
@@ -48,14 +40,9 @@ export const Route = createRootRouteWithContext()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
+    <>
+      {children}
+      <Scripts />
+    </>
   )
 }

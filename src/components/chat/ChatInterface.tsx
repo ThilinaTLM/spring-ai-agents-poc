@@ -6,17 +6,7 @@ import type { Message } from './ChatMessage'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sparkles } from 'lucide-react'
-
-const SAMPLE_RESPONSES = [
-  "I'm here to help! What would you like to know?",
-  "That's an interesting question. Let me think about that...",
-  "I understand what you're asking. Here's my perspective on that:",
-  "Great question! I'd be happy to help you with that.",
-  "That's a thoughtful inquiry. Let me provide some insights:",
-  "I appreciate you asking about that. Here's what I think:",
-  "That's something I can definitely help with. Let me explain:",
-  "Interesting point! I'd like to share my thoughts on this:",
-]
+import { useSendChatMessageExperiment } from '@/net/query/chat'
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<Array<Message>>([
@@ -27,8 +17,8 @@ export function ChatInterface() {
       timestamp: new Date(),
     },
   ])
-  const [isTyping, setIsTyping] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const chatMutation = useSendChatMessageExperiment()
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -47,7 +37,7 @@ export function ChatInterface() {
   useEffect(() => {
     const timer = setTimeout(scrollToBottom, 100)
     return () => clearTimeout(timer)
-  }, [messages, isTyping])
+  }, [messages, chatMutation.isPending])
 
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
@@ -58,23 +48,30 @@ export function ChatInterface() {
     }
 
     setMessages((prev) => [...prev, userMessage])
-    setIsTyping(true)
 
-    // Simulate AI response delay
-    await new Promise((resolve) =>
-      setTimeout(resolve, 1000 + Math.random() * 2000),
-    )
+    try {
+      const response = await chatMutation.mutateAsync({ prompt: content })
 
-    const botMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      content:
-        SAMPLE_RESPONSES[Math.floor(Math.random() * SAMPLE_RESPONSES.length)],
-      role: 'assistant',
-      timestamp: new Date(),
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: response.response,
+        role: 'assistant',
+        timestamp: new Date(response.timestamp),
+      }
+
+      setMessages((prev) => [...prev, botMessage])
+    } catch (error) {
+      // Add error message to chat
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content:
+          "Sorry, I'm having trouble connecting right now. Please try again.",
+        role: 'assistant',
+        timestamp: new Date(),
+      }
+
+      setMessages((prev) => [...prev, errorMessage])
     }
-
-    setMessages((prev) => [...prev, botMessage])
-    setIsTyping(false)
   }
 
   return (
@@ -95,7 +92,7 @@ export function ChatInterface() {
               </div>
             ))}
 
-            {isTyping && (
+            {chatMutation.isPending && (
               <div className="flex gap-3 px-4 py-3 md:px-6 md:py-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <Avatar className="size-8 md:size-9 shrink-0 mr-2">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold shadow-lg">
@@ -133,8 +130,10 @@ export function ChatInterface() {
       {/* Input Area */}
       <ChatInput
         onSendMessage={handleSendMessage}
-        disabled={isTyping}
-        placeholder={isTyping ? 'AI is typing...' : 'Type your message...'}
+        disabled={chatMutation.isPending}
+        placeholder={
+          chatMutation.isPending ? 'AI is typing...' : 'Type your message...'
+        }
       />
     </div>
   )
