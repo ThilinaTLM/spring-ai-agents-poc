@@ -1,19 +1,14 @@
 'use client'
 
 import { AxiosInstance } from 'axios'
-import type { UserDto } from '../types/user'
+import type { ChatExperimentFormDto, ChatExperimentDto } from '../types/chat'
 
-const chatsApi = (axios: () => Promise<AxiosInstance>) => ({
-  getById: async (userId: string) => {
+const chatApi = (axios: () => Promise<AxiosInstance>) => ({
+  experimentChat: async (request: ChatExperimentFormDto) => {
     const client = await axios()
-    const response = await client.get<UserDto>(`/api/v1/users/${userId}`)
-    return response.data
-  },
-  getCurrentUser: async () => {
-    const client = await axios()
-    const response = await client.get<UserDto>('/api/v1/users/me')
+    const response = await client.post<ChatExperimentDto>('/api/v1/chat/experiment', request)
     return response.data
   },
 })
 
-export default chatsApi
+export default chatApi
