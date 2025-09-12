@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -33,6 +34,16 @@ public class Message {
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    @Column(name = "token_count")
+    private Integer tokenCount;
+
+    @ElementCollection
+    @CollectionTable(name = "message_metadata",
+            joinColumns = @JoinColumn(name = "message_id"))
+    @MapKeyColumn(name = "metadata_key")
+    @Column(name = "metadata_value")
+    private Map<String, String> metadata;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
