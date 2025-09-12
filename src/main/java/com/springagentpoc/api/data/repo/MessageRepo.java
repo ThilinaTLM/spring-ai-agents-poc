@@ -1,5 +1,6 @@
 package com.springagentpoc.api.data.repo;
 
+import com.springagentpoc.api.data.embedded.MessageRole;
 import com.springagentpoc.api.data.entity.Message;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

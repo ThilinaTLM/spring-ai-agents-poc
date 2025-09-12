@@ -13,11 +13,17 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Table(name = "messages", indexes = {
+@Table(name = "messages", 
+       indexes = {
         @Index(name = "idx_message_conversation", columnList = "conversation_id"),
         @Index(name = "idx_message_created", columnList = "created_at"),
-        @Index(name = "idx_message_role", columnList = "role")
-})
+        @Index(name = "idx_message_role", columnList = "role"),
+        @Index(name = "idx_message_content_hash", columnList = "content_hash")
+       },
+       uniqueConstraints = {
+        @UniqueConstraint(name = "uk_message_conversation_hash", 
+                         columnNames = {"conversation_id", "content_hash", "role"})
+       })
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,6 +40,9 @@ public class Message {
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    @Column(name = "content_hash", length = 64, nullable = false)
+    private String contentHash;
 
     @Column(name = "token_count")
     private Integer tokenCount;

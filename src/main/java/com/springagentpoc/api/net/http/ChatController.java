@@ -22,22 +22,6 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping("/experiment")
-    @Operation(
-            summary = "Chat experiment",
-            description = "Send a prompt to the AI and receive a response for experimental purposes"
-    )
-    public ResponseEntity<ChatExperimentDto> experimentChat(
-            @Valid @RequestBody ChatExperimentFormDto request
-    ) {
-        log.info("Received chat experiment request");
-
-        String aiResponse = chatService.experimentChat(request.getPrompt());
-        ChatExperimentDto response = new ChatExperimentDto(aiResponse);
-
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/conversation")
     @Operation(
             summary = "Start new conversation",

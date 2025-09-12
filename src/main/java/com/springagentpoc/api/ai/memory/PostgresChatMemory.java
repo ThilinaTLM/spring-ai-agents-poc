@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +41,16 @@ public class PostgresChatMemory implements ChatMemory {
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found: " + conversationId));
 
         for (org.springframework.ai.chat.messages.Message aiMessage : messages) {
+            String content = aiMessage.getText();
+            String contentHash = generateContentHash(content);
+            MessageRole role = mapAiRoleToDbRole(aiMessage.getMessageType());
+
             Message message = new Message();
             message.setConversation(conversation);
-            message.setRole(mapAiRoleToDbRole(aiMessage.getMessageType()));
-            message.setContent(aiMessage.getText());
-            message.setTokenCount(estimateTokenCount(aiMessage.getText()));
+            message.setRole(role);
+            message.setContent(content);
+            message.setContentHash(contentHash);
+            message.setTokenCount(estimateTokenCount(content));
 
             messageRepo.save(message);
         }
@@ -139,5 +146,27 @@ public class PostgresChatMemory implements ChatMemory {
 
     private int estimateTokenCount(String text) {
         return text.length() / 4;
+    }
+    
+    private String generateContentHash(String content) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(content.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+            
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException | java.io.UnsupportedEncodingException e) {
+            log.error("Error generating content hash", e);
+            // Fallback to a simple hash
+            return String.valueOf(content.hashCode());
+        }
     }
 }
