@@ -65,7 +65,7 @@ const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) => {
   }, [setSession, clearSession, keycloak, setKeycloak])
 
   if (!keycloak || !initialized) {
-    return <div>Loading...</div>
+    return null
   }
 
   return <>{children}</>

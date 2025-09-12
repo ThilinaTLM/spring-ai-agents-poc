@@ -18,6 +18,7 @@ export async function getApiClient(): Promise<AxiosInstance> {
 
     axiosInstance.interceptors.request.use(async (config) => {
       const token = getAuthToken()
+      console.log('Attaching token to request:', token)
       if (token) {
         config.headers = config.headers ?? {}
         config.headers.Authorization = `Bearer ${token}`

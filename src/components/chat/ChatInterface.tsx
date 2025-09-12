@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { ChatMessage } from './ChatMessage'
 import { ChatInput } from './ChatInput'
 import { ChatHeader } from './ChatHeader'
@@ -6,19 +6,29 @@ import type { Message } from './ChatMessage'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sparkles } from 'lucide-react'
-import { useSendChatMessageExperiment } from '@/net/query/chat'
+import { useStartConversation, useSendMessage } from '@/net/query/chat'
+import {
+  useMessages,
+  useCurrentConversationId,
+  useConversationLoading,
+  useAddMessage,
+  useSetCurrentConversationId,
+  useSetLoading,
+  useSetError,
+} from '@/stores/conversationStore'
 
 export function ChatInterface() {
-  const [messages, setMessages] = useState<Array<Message>>([
-    {
-      id: '1',
-      content: "Hello! I'm your AI assistant. How can I help you today?",
-      role: 'assistant',
-      timestamp: new Date(),
-    },
-  ])
+  const messages = useMessages()
+  const currentConversationId = useCurrentConversationId()
+  const isLoading = useConversationLoading()
+  const addMessage = useAddMessage()
+  const setCurrentConversationId = useSetCurrentConversationId()
+  const setLoading = useSetLoading()
+  const setError = useSetError()
+
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const chatMutation = useSendChatMessageExperiment()
+  const startConversationMutation = useStartConversation()
+  const sendMessageMutation = useSendMessage()
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -37,31 +47,48 @@ export function ChatInterface() {
   useEffect(() => {
     const timer = setTimeout(scrollToBottom, 100)
     return () => clearTimeout(timer)
-  }, [messages, chatMutation.isPending])
+  }, [messages, isLoading])
 
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
       role: 'user',
-      timestamp: new Date(),
+      timestamp: new Date().toString(),
     }
 
-    setMessages((prev) => [...prev, userMessage])
+    addMessage(userMessage)
+    setLoading(true)
+    setError(null)
 
     try {
-      const response = await chatMutation.mutateAsync({ prompt: content })
+      let conversationId = currentConversationId
+
+      // Start new conversation if we don't have one
+      if (!conversationId) {
+        const conversationResponse =
+          await startConversationMutation.mutateAsync({
+            title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
+          })
+        conversationId = conversationResponse.conversationId
+        setCurrentConversationId(conversationId)
+      }
+
+      // Send message to the conversation
+      const response = await sendMessageMutation.mutateAsync({
+        conversationId,
+        request: { message: content },
+      })
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: response.response,
         role: 'assistant',
-        timestamp: new Date(response.timestamp),
+        timestamp: new Date(),
       }
 
-      setMessages((prev) => [...prev, botMessage])
+      addMessage(botMessage)
     } catch (error) {
-      // Add error message to chat
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content:
@@ -70,7 +97,10 @@ export function ChatInterface() {
         timestamp: new Date(),
       }
 
-      setMessages((prev) => [...prev, errorMessage])
+      addMessage(errorMessage)
+      setError('Failed to send message')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -92,7 +122,7 @@ export function ChatInterface() {
               </div>
             ))}
 
-            {chatMutation.isPending && (
+            {isLoading && (
               <div className="flex gap-3 px-4 py-3 md:px-6 md:py-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <Avatar className="size-8 md:size-9 shrink-0 mr-2">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold shadow-lg">
@@ -130,10 +160,8 @@ export function ChatInterface() {
       {/* Input Area */}
       <ChatInput
         onSendMessage={handleSendMessage}
-        disabled={chatMutation.isPending}
-        placeholder={
-          chatMutation.isPending ? 'AI is typing...' : 'Type your message...'
-        }
+        disabled={isLoading}
+        placeholder={isLoading ? 'AI is typing...' : 'Type your message...'}
       />
     </div>
   )

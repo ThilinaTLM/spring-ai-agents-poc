@@ -18,6 +18,7 @@ const useAuthStore = create<AuthStore>((set) => ({
   setKeycloak: (kc: Keycloak) => set({ keycloak: kc }),
   setSession: (kc) => {
     const token = kc.token
+    console.log('token parsed', kc.tokenParsed)
     const user = {
       id: kc.tokenParsed?.sub ?? null,
       firstName: kc.tokenParsed?.given_name ?? null,
@@ -48,7 +49,7 @@ export const useAuthActions = () => {
   if (!keycloak) {
     throw new Error('Keycloak client is not initialized')
   }
-  const login = () => keycloak.login({ scope: 'openid profile email roles' })
+  const login = () => keycloak.login({ scope: 'openid profile email' })
   const logout = () => keycloak.logout()
   return { login, logout }
 }

@@ -5,7 +5,7 @@ export interface Message {
   id: string
   content: string
   role: 'user' | 'assistant'
-  timestamp: Date
+  timestamp: string
 }
 
 interface ChatMessageProps {
@@ -60,7 +60,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             {isUser ? 'You' : 'Assistant'}
           </span>
           <span className="text-xs text-muted-foreground">
-            {message.timestamp.toLocaleTimeString([], {
+            {new Date(message.timestamp).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit',
             })}

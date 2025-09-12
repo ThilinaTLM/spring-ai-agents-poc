@@ -6,6 +6,7 @@ import KeycloakProvider from '@/components/providers/KeycloakProvider.tsx'
 import { TanstackDevtools } from '@tanstack/react-devtools'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import TanStackQueryDevtools from './QueryDevTools'
+import Protected from '@/components/common/Protected'
 
 const queryClient = new QueryClient()
 
@@ -13,7 +14,9 @@ const Providers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="theme">
       <QueryClientProvider client={queryClient}>
-        <KeycloakProvider>{children}</KeycloakProvider>
+        <KeycloakProvider>
+          <Protected>{children}</Protected>
+        </KeycloakProvider>
       </QueryClientProvider>
       <Toaster
         position="bottom-right"

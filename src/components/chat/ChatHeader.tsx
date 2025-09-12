@@ -1,11 +1,41 @@
-import { MessageCircle } from 'lucide-react'
-import { ThemeToggle } from '@/components/common/ThemeToggle'
+import { MessageCircle, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ProfileDropdown } from '@/components/common/ProfileDropdown'
+import { useStartNewConversation } from '@/stores/conversationStore'
+import { useStartConversation } from '@/net/query/chat'
 
 export function ChatHeader() {
+  const startNewConversation = useStartNewConversation()
+  const startConversationMutation = useStartConversation()
+
+  const handleNewConversation = async () => {
+    try {
+      const conversationResponse = await startConversationMutation.mutateAsync({
+        title: 'New Conversation',
+      })
+      startNewConversation(conversationResponse.conversationId)
+    } catch (error) {
+      console.error('Failed to create new conversation:', error)
+      // Fall back to local-only behavior
+      startNewConversation()
+    }
+  }
+
   return (
     <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
       <div className="flex items-center justify-between px-4 md:px-6 py-4">
-        <div className="flex-1" />
+        <div className="flex-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNewConversation}
+            disabled={startConversationMutation.isPending}
+            className="gap-2 text-foreground"
+          >
+            <Plus className="size-4" />
+            {startConversationMutation.isPending ? 'Creating...' : 'New Chat'}
+          </Button>
+        </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="size-10 bg-primary rounded-full flex items-center justify-center shadow-lg">
@@ -23,7 +53,7 @@ export function ChatHeader() {
           </div>
         </div>
         <div className="flex-1 flex justify-end">
-          <ThemeToggle />
+          <ProfileDropdown />
         </div>
       </div>
     </div>
