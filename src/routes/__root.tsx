@@ -4,22 +4,10 @@ import {
   createRootRouteWithContext,
   Link,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanstackDevtools } from '@tanstack/react-devtools'
-
-import TanStackQueryDevtools from '../components/providers/QueryDevTools'
 import { Button } from '@/components/ui/button'
-import { ThemeProvider } from '@/components/providers/ThemeProvider'
-
 import appCss from '../styles.css?url'
 
-import type { QueryClient } from '@tanstack/react-query'
-
-interface MyRouterContext {
-  queryClient: QueryClient
-}
-
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRouteWithContext()({
   head: () => ({
     meta: [
       {
@@ -30,7 +18,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Spring Agent Demo',
+        title: 'SpringAgentic PoC',
       },
     ],
     links: [
@@ -65,21 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-          {children}
-          <TanstackDevtools
-            config={{
-              position: 'bottom-left',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              TanStackQueryDevtools,
-            ]}
-          />
-        </ThemeProvider>
+        {children}
         <Scripts />
       </body>
     </html>
