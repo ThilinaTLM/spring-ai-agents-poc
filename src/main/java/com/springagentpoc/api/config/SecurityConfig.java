@@ -28,7 +28,7 @@ public class SecurityConfig {
 
     private static final RequestMatcher[] PUBLIC_ROUTES = {
             PathPatternRequestMatcher.withDefaults().matcher("/docs/**"),
-            PathPatternRequestMatcher.withDefaults().matcher("/ws/**"),
+            PathPatternRequestMatcher.withDefaults().matcher("/api/v1/chat/**"),
             PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/actuator/health"),
     };
     private final CorsProperties corsProperties;
