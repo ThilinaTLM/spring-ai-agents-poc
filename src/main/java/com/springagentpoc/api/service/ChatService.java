@@ -1,6 +1,5 @@
 package com.springagentpoc.api.service;
 
-import com.springagentpoc.api.net.tool.TransactionTools;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -13,14 +12,16 @@ import org.springframework.stereotype.Service;
 public class ChatService {
 
     private final ChatModel chatModel;
+    private final TransactionService transactionService;
 
     public String experimentChat(String userPrompt) {
         log.debug("Processing chat experiment with prompt: {}", userPrompt);
 
         try {
             String response = ChatClient.create(chatModel)
-                    .prompt(userPrompt)
-                    .toolNames(TransactionTools.GET_TOTAL_INCOME)
+                    .prompt()
+                    .user(userPrompt)
+                    .tools(transactionService)
                     .call()
                     .content();
 

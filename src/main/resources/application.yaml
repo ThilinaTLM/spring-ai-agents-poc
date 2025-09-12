@@ -35,7 +35,7 @@ springdoc:
 google:
   cloud:
     chat:
-      model-name: "gemini-2.5-flash"
+      model-name: "gemini-2.5-pro"
       temperature: 0.2
       max-tokens: 2048
     project-id: ${google.cloud.project-id}
