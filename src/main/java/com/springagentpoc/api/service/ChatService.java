@@ -13,6 +13,8 @@ public class ChatService {
 
     private final ChatModel chatModel;
     private final TransactionService transactionService;
+    private final TransactionAnalyticsService transactionAnalyticsService;
+    private final TransactionInsightsService transactionInsightsService;
 
     public String experimentChat(String userPrompt) {
         log.debug("Processing chat experiment with prompt: {}", userPrompt);
@@ -21,7 +23,7 @@ public class ChatService {
             String response = ChatClient.create(chatModel)
                     .prompt()
                     .user(userPrompt)
-                    .tools(transactionService)
+                    .tools(transactionService, transactionAnalyticsService, transactionInsightsService)
                     .call()
                     .content();
 
