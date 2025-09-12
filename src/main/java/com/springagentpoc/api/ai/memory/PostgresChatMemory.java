@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -129,7 +130,6 @@ public class PostgresChatMemory implements ChatMemory {
             case ASSISTANT -> MessageRole.ASSISTANT;
             case SYSTEM -> MessageRole.SYSTEM;
             case TOOL -> MessageRole.TOOL;
-            default -> throw new IllegalArgumentException("Unknown message type: " + messageType);
         };
     }
 
@@ -151,7 +151,7 @@ public class PostgresChatMemory implements ChatMemory {
     private String generateContentHash(String content) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(content.getBytes("UTF-8"));
+            byte[] hash = digest.digest(content.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();
             
             for (byte b : hash) {
@@ -163,7 +163,7 @@ public class PostgresChatMemory implements ChatMemory {
             }
             
             return hexString.toString();
-        } catch (NoSuchAlgorithmException | java.io.UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException e) {
             log.error("Error generating content hash", e);
             // Fallback to a simple hash
             return String.valueOf(content.hashCode());
