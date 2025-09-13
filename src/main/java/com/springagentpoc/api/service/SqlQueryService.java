@@ -18,24 +18,28 @@ import java.util.regex.Pattern;
 @Slf4j
 public class SqlQueryService {
 
-    private static final Set<String> ALLOWED_KEYWORDS = Set.of(
-            "SELECT", "FROM", "WHERE", "JOIN", "INNER", "LEFT", "RIGHT", "OUTER", "FULL",
-            "ON", "GROUP", "BY", "HAVING", "ORDER", "LIMIT", "OFFSET", "AS", "AND", "OR",
-            "NOT", "IN", "EXISTS", "BETWEEN", "LIKE", "IS", "NULL", "DISTINCT", "UNION",
-            "CASE", "WHEN", "THEN", "ELSE", "END", "COUNT", "SUM", "AVG", "MIN", "MAX",
-            "COALESCE", "CAST", "EXTRACT", "DATE_TRUNC", "NOW", "CURRENT_TIMESTAMP"
-    );
     private static final Set<String> BLOCKED_KEYWORDS = Set.of(
             "DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE", "GRANT",
             "REVOKE", "EXEC", "EXECUTE", "CALL", "MERGE", "UPSERT", "REPLACE", "LOAD",
             "COPY", "BULK", "IMPORT", "EXPORT", "BACKUP", "RESTORE"
     );
-    private static final Pattern SQL_INJECTION_PATTERN = Pattern.compile(
-            "('([^']|'')*')|" +                    // Single quoted strings
-                    "(;\\s*(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\\b)|" + // Dangerous statements after semicolon
-                    "(--)|" +                              // SQL comments
-                    "(/\\*.*?\\*/)",
-            Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+
+    private static final Set<String> ALLOWED_TABLES = Set.of(
+            "transactions", "conversations", "messages"
+    );
+    private static final Pattern DANGEROUS_KEYWORD_PATTERN = Pattern.compile(
+            "\\b(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE|TRUNCATE|GRANT|REVOKE|EXEC|EXECUTE|CALL|MERGE|UPSERT|REPLACE|LOAD|COPY|BULK|IMPORT|EXPORT|BACKUP|RESTORE)\\b",
+            Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern SQL_COMMENT_PATTERN = Pattern.compile(
+            "--.*$|/\\*.*?\\*/",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE
+    );
+
+    private static final Pattern MULTIPLE_STATEMENTS_PATTERN = Pattern.compile(
+            ";\\s*\\w+",
+            Pattern.CASE_INSENSITIVE
     );
 
     private final JdbcTemplate jdbcTemplate;
@@ -121,27 +125,16 @@ public class SqlQueryService {
             throw new IllegalArgumentException("Only SELECT queries are allowed");
         }
 
-        for (String blockedKeyword : BLOCKED_KEYWORDS) {
-            if (upperQuery.contains(blockedKeyword)) {
-                throw new IllegalArgumentException("Blocked keyword detected: " + blockedKeyword);
-            }
+        if (SQL_COMMENT_PATTERN.matcher(query).find()) {
+            throw new IllegalArgumentException("SQL comments are not allowed");
         }
 
-        if (SQL_INJECTION_PATTERN.matcher(query).find()) {
-            if (query.contains("--") || query.contains("/*") || query.matches(".*;\\s*(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE).*")) {
-                throw new IllegalArgumentException("Potentially dangerous SQL pattern detected");
-            }
+        if (MULTIPLE_STATEMENTS_PATTERN.matcher(query).find()) {
+            throw new IllegalArgumentException("Multiple SQL statements are not allowed");
         }
 
-        String[] tokens = upperQuery.split("\\s+");
-        for (String token : tokens) {
-            if (token.matches("\\d+|[(),.=<>!+\\-*/]|'[^']*'|\"[^\"]*\"")) {
-                continue;
-            }
-
-            if (BLOCKED_KEYWORDS.contains(token)) {
-                throw new IllegalArgumentException("Blocked keyword detected: " + token);
-            }
+        if (DANGEROUS_KEYWORD_PATTERN.matcher(query).find()) {
+            throw new IllegalArgumentException("Dangerous SQL keywords detected");
         }
 
         if (query.length() > 2000) {

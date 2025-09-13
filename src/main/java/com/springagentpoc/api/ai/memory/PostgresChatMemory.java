@@ -119,6 +119,22 @@ public class PostgresChatMemory implements ChatMemory {
         return conversation.getId();
     }
 
+    public boolean conversationExists(UUID conversationId) {
+        return conversationRepo.existsById(conversationId);
+    }
+
+    public UUID createConversationIfNotExists(UUID conversationId, UUID userId, String title) {
+        if (!conversationExists(conversationId)) {
+            Conversation conversation = new Conversation();
+            conversation.setId(conversationId);
+            conversation.setUserId(userId);
+            conversation.setTitle(title != null ? title : "New Conversation");
+            conversation = conversationRepo.save(conversation);
+            return conversation.getId();
+        }
+        return conversationId;
+    }
+
     private MessageRole mapAiRoleToDbRole(MessageType messageType) {
         return switch (messageType) {
             case USER -> MessageRole.USER;

@@ -28,7 +28,7 @@ public class ChatController {
     @PostMapping("/conversation")
     @Operation(
             summary = "Start new conversation",
-            description = "Create a new conversation for a user"
+            description = "Generate a new conversation ID. The actual conversation is created lazily when the first message is sent."
     )
     public ResponseEntity<ConversationDto> startConversation(
             @UserId UUID userId,
@@ -44,14 +44,14 @@ public class ChatController {
     @PostMapping("/conversation/{conversationId}/message")
     @Operation(
             summary = "Send message with memory",
-            description = "Send a message to an existing conversation with memory"
+            description = "Send a message to a conversation. If the conversation doesn't exist, it will be created automatically."
     )
     public ResponseEntity<ChatMessageDto> sendMessage(
             @UserId UUID userId,
             @PathVariable UUID conversationId,
             @Valid @RequestBody ChatMessageFormDto request
     ) {
-        String response = chatService.chatWithMemory(
+        String response = chatService.chat(
                 request.getMessage(),
                 userId,
                 conversationId
