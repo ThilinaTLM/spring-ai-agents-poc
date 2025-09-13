@@ -20,7 +20,6 @@ import java.util.UUID;
 @Data
 public class Conversation {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
@@ -44,6 +43,10 @@ public class Conversation {
 
     @Column(name = "last_message_at")
     private LocalDateTime lastMessageAt;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("createdAt ASC")

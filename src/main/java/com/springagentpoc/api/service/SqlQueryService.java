@@ -82,7 +82,7 @@ public class SqlQueryService {
             Always use proper SQL syntax and include appropriate WHERE clauses to filter data.
             """)
     public Map<String, Object> executeQuery(
-            @ToolParam(description = "SQL SELECT query to execute against the database")
+            @ToolParam(description = "SQL SELECT query to execute against the database", required = true)
             String sqlQuery
     ) {
         log.debug("Executing SQL query: {}", sqlQuery);

@@ -7,8 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
@@ -33,20 +32,42 @@ public class Message {
     @Column(name = "role", nullable = false, length = 20)
     private MessageRole role;
 
-    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "token_count")
     private Integer tokenCount;
 
-    @ElementCollection
+    // Tool-related fields
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("sequenceNumber ASC")
+    private List<ToolCall> toolCalls = new ArrayList<>();
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("sequenceNumber ASC")
+    private List<ToolResponse> toolResponses = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "message_metadata",
             joinColumns = @JoinColumn(name = "message_id"))
     @MapKeyColumn(name = "metadata_key")
-    @Column(name = "metadata_value")
-    private Map<String, String> metadata;
+    @Column(name = "metadata_value", columnDefinition = "TEXT")
+    private Map<String, String> metadata = new HashMap<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // Helper methods
+    public void addToolCall(ToolCall toolCall) {
+        toolCalls.add(toolCall);
+        toolCall.setMessage(this);
+        toolCall.setSequenceNumber(toolCalls.size() - 1);
+    }
+
+    public void addToolResponse(ToolResponse toolResponse) {
+        toolResponses.add(toolResponse);
+        toolResponse.setMessage(this);
+        toolResponse.setSequenceNumber(toolResponses.size() - 1);
+    }
 }
