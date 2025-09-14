@@ -30,6 +30,7 @@ public class PostgresChatMemory implements ChatMemory {
 
     private static final int MAX_MESSAGES_TO_LOAD = 20;
     private static final int MAX_TOKEN_COUNT = 4000;
+
     private final ConversationRepo conversationRepo;
     private final MessageRepo messageRepo;
     private final ObjectMapper objectMapper;
@@ -49,12 +50,10 @@ public class PostgresChatMemory implements ChatMemory {
             message.setConversation(conversation);
             message.setRole(mapAiRoleToDbRole(aiMessage.getMessageType()));
 
-            // Handle content
             String content = aiMessage.getText();
             message.setContent(content);
             message.setTokenCount(estimateTokenCount(content != null ? content : ""));
 
-            // Handle metadata
             if (aiMessage.getMetadata() != null && !aiMessage.getMetadata().isEmpty()) {
                 Map<String, String> metadata = new HashMap<>();
                 for (Map.Entry<String, Object> entry : aiMessage.getMetadata().entrySet()) {
@@ -63,10 +62,9 @@ public class PostgresChatMemory implements ChatMemory {
                 message.setMetadata(metadata);
             }
 
-            // Handle tool calls for Assistant messages
             if (aiMessage instanceof AssistantMessage assistantMessage) {
                 List<AssistantMessage.ToolCall> toolCalls = assistantMessage.getToolCalls();
-                if (toolCalls != null && !toolCalls.isEmpty()) {
+                if (!toolCalls.isEmpty()) {
                     for (AssistantMessage.ToolCall aiToolCall : toolCalls) {
                         ToolCall toolCall = new ToolCall();
                         toolCall.setToolCallId(aiToolCall.id());
@@ -78,10 +76,9 @@ public class PostgresChatMemory implements ChatMemory {
                 }
             }
 
-            // Handle tool responses for Tool messages
             if (aiMessage instanceof ToolResponseMessage toolResponseMessage) {
                 List<ToolResponseMessage.ToolResponse> responses = toolResponseMessage.getResponses();
-                if (responses != null && !responses.isEmpty()) {
+                if (!responses.isEmpty()) {
                     for (ToolResponseMessage.ToolResponse aiToolResponse : responses) {
                         ToolResponse toolResponse = new ToolResponse();
                         toolResponse.setToolResponseId(aiToolResponse.id());
@@ -95,7 +92,6 @@ public class PostgresChatMemory implements ChatMemory {
             messageRepo.save(message);
         }
 
-        // Update lastMessageAt with retry logic for concurrent modifications
         updateLastMessageAtWithRetry(convId, 3);
     }
 
