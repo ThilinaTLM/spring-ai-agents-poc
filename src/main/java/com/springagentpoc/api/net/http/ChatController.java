@@ -25,22 +25,6 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping("/conversation")
-    @Operation(
-            summary = "Start new conversation",
-            description = "Generate a new conversation ID. The actual conversation is created lazily when the first message is sent."
-    )
-    public ResponseEntity<ConversationDto> startConversation(
-            @UserId UUID userId,
-            @Valid @RequestBody StartConversationFormDto request
-    ) {
-        UUID conversationId = chatService.startNewConversation(
-                userId,
-                request.getTitle()
-        );
-        return ResponseEntity.ok(new ConversationDto(conversationId));
-    }
-
     @PostMapping("/conversation/{conversationId}/message")
     @Operation(
             summary = "Send message with memory",
@@ -57,18 +41,5 @@ public class ChatController {
                 conversationId
         );
         return ResponseEntity.ok(new ChatMessageDto(response));
-    }
-
-    @DeleteMapping("/conversation/{conversationId}/messages")
-    @Operation(
-            summary = "Clear conversation",
-            description = "Clear all messages from a conversation"
-    )
-    public ResponseEntity<Void> clearConversation(
-            @UserId UUID userId,
-            @PathVariable UUID conversationId
-    ) {
-        chatService.clearConversation(conversationId);
-        return ResponseEntity.noContent().build();
     }
 }

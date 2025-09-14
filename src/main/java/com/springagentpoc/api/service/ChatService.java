@@ -1,6 +1,5 @@
 package com.springagentpoc.api.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springagentpoc.api.ai.memory.PostgresChatMemory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,6 @@ public class ChatService {
             messages.add(new SystemMessage(systemPrompt));
         }
 
-
         messages.add(new UserMessage(userPrompt));
         Prompt prompt = new Prompt(messages, chatOptions);
         ChatResponse chatResponse = chatModel.call(prompt);
@@ -75,13 +73,5 @@ public class ChatService {
 
         chatMemory.add(conversationId.toString(), messages.subList(chatMemoryInitialSize, messages.size()));
         return messages.get(messages.size() - 1).getText();
-    }
-
-    public UUID startNewConversation(UUID userId, String title) {
-        return UUID.randomUUID();
-    }
-
-    public void clearConversation(UUID conversationId) {
-        chatMemory.clear(conversationId.toString());
     }
 }
