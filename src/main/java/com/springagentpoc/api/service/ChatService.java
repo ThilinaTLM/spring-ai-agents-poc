@@ -1,6 +1,6 @@
 package com.springagentpoc.api.service;
 
-import com.springagentpoc.api.ai.memory.PostgresChatMemory;
+import com.springagentpoc.api.service.ChatMemoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class ChatService {
 
     private final ChatModel chatModel;
-    private final PostgresChatMemory chatMemory;
+    private final ChatMemoryService chatMemory;
     private final SqlQueryService sqlQueryService;
     private final String systemPrompt;
 
@@ -41,7 +41,7 @@ public class ChatService {
                 .build();
 
         chatMemory.createConversationIfNotExists(conversationId, userId, "New Conversation");
-        List<Message> messages = chatMemory.get(conversationId.toString());
+        List<Message> messages = chatMemory.getMessages(conversationId);
         int chatMemoryInitialSize = messages.size();
         if (messages.isEmpty()) {
             messages.add(new SystemMessage(systemPrompt));
@@ -71,7 +71,7 @@ public class ChatService {
             }
         }
 
-        chatMemory.add(conversationId.toString(), messages.subList(chatMemoryInitialSize, messages.size()));
+        chatMemory.addMessages(conversationId, messages.subList(chatMemoryInitialSize, messages.size()));
         return messages.get(messages.size() - 1).getText();
     }
 }

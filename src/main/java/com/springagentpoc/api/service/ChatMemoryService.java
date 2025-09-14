@@ -1,4 +1,4 @@
-package com.springagentpoc.api.ai.memory;
+package com.springagentpoc.api.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,21 +12,20 @@ import com.springagentpoc.api.data.repo.MessageRepo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class PostgresChatMemory implements ChatMemory {
+public class ChatMemoryService {
 
     private static final int MAX_MESSAGES_TO_LOAD = 20;
     private static final int MAX_TOKEN_COUNT = 4000;
@@ -35,14 +34,11 @@ public class PostgresChatMemory implements ChatMemory {
     private final MessageRepo messageRepo;
     private final ObjectMapper objectMapper;
 
-    @Override
     @Transactional
-    public void add(@NonNull String conversationId, List<org.springframework.ai.chat.messages.Message> messages) {
+    public void addMessages(@NonNull UUID conversationId, List<org.springframework.ai.chat.messages.Message> messages) {
         log.debug("Adding {} messages to conversation {}", messages.size(), conversationId);
 
-        UUID convId = UUID.fromString(conversationId);
-
-        Conversation conversation = conversationRepo.findById(convId)
+        Conversation conversation = conversationRepo.findById(conversationId)
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found: " + conversationId));
 
         for (org.springframework.ai.chat.messages.Message aiMessage : messages) {
@@ -92,17 +88,16 @@ public class PostgresChatMemory implements ChatMemory {
             messageRepo.save(message);
         }
 
-        updateLastMessageAtWithRetry(convId, 3);
+        updateLastMessageAtWithRetry(conversationId, 3);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public @NonNull List<org.springframework.ai.chat.messages.Message> get(@NonNull String conversationId) {
+    public @NonNull List<org.springframework.ai.chat.messages.Message> getMessages(@NonNull UUID conversationId) {
         int lastN = MAX_MESSAGES_TO_LOAD;
         log.debug("Retrieving last {} messages from conversation {}", lastN, conversationId);
 
         List<Message> messages = messageRepo.findLatestMessagesByConversationId(
-                UUID.fromString(conversationId),
+                conversationId,
                 PageRequest.of(0, lastN)
         );
 
@@ -114,12 +109,11 @@ public class PostgresChatMemory implements ChatMemory {
                 .collect(Collectors.toList());
     }
 
-    @Override
     @Transactional
-    public void clear(@NonNull String conversationId) {
+    public void clearMessages(@NonNull UUID conversationId) {
         log.debug("Clearing messages for conversation {}", conversationId);
 
-        Conversation conversation = conversationRepo.findById(UUID.fromString(conversationId))
+        Conversation conversation = conversationRepo.findById(conversationId)
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found: " + conversationId));
 
         messageRepo.deleteAll(conversation.getMessages());
@@ -129,12 +123,10 @@ public class PostgresChatMemory implements ChatMemory {
     }
 
     @Transactional(readOnly = true)
-    public List<org.springframework.ai.chat.messages.Message> getWithTokenLimit(String conversationId) {
+    public List<org.springframework.ai.chat.messages.Message> getMessagesWithTokenLimit(UUID conversationId) {
         log.debug("Retrieving messages with token limit for conversation {}", conversationId);
 
-        List<Message> allMessages = messageRepo.findByConversationIdOrderByCreatedAtAsc(
-                UUID.fromString(conversationId)
-        );
+        List<Message> allMessages = messageRepo.findByConversationIdOrderByCreatedAtAsc(conversationId);
 
         List<org.springframework.ai.chat.messages.Message> result = new ArrayList<>();
         int totalTokens = 0;
@@ -190,7 +182,6 @@ public class PostgresChatMemory implements ChatMemory {
     }
 
     private org.springframework.ai.chat.messages.Message mapDbMessageToAiMessage(Message dbMessage) {
-        // Reconstruct metadata
         Map<String, Object> metadata = new HashMap<>();
         if (dbMessage.getMetadata() != null) {
             metadata.putAll(dbMessage.getMetadata());
@@ -204,7 +195,6 @@ public class PostgresChatMemory implements ChatMemory {
                 yield userMessage;
             }
             case ASSISTANT -> {
-                // Check if this assistant message has tool calls
                 if (dbMessage.getToolCalls() != null && !dbMessage.getToolCalls().isEmpty()) {
                     List<AssistantMessage.ToolCall> toolCalls = dbMessage.getToolCalls().stream()
                             .sorted(Comparator.comparing(ToolCall::getSequenceNumber))
@@ -233,7 +223,6 @@ public class PostgresChatMemory implements ChatMemory {
                 yield systemMessage;
             }
             case TOOL -> {
-                // Reconstruct tool responses
                 List<ToolResponseMessage.ToolResponse> toolResponses = new ArrayList<>();
 
                 if (dbMessage.getToolResponses() != null && !dbMessage.getToolResponses().isEmpty()) {
@@ -246,7 +235,6 @@ public class PostgresChatMemory implements ChatMemory {
                             ))
                             .collect(Collectors.toList());
                 } else {
-                    // Fallback for backward compatibility or simple tool messages
                     toolResponses.add(new ToolResponseMessage.ToolResponse(
                             "",
                             "Tool",
