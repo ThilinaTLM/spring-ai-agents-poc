@@ -3,8 +3,12 @@ package com.springagentpoc.api.data.entity;
 import com.springagentpoc.api.data.embedded.ConversationStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
+import org.springframework.ai.chat.messages.Message;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +22,7 @@ import java.util.UUID;
         @Index(name = "idx_conversation_status", columnList = "status")
 })
 @Data
+@Slf4j
 public class Conversation {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
@@ -32,6 +37,13 @@ public class Conversation {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private ConversationStatus status = ConversationStatus.ACTIVE;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "messages", columnDefinition = "jsonb")
+    private List<Message> messages = new ArrayList<>();
+
+    @Column(name = "total_token_count")
+    private Integer totalTokenCount = 0;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -48,7 +60,34 @@ public class Conversation {
     @Column(name = "version")
     private Long version;
 
-    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @OrderBy("createdAt ASC")
-    private List<Message> messages = new ArrayList<>();
+    public void addMessage(Message message) {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
+        this.messages.add(message);
+        this.lastMessageAt = LocalDateTime.now();
+    }
+
+    public void addMessages(List<Message> messages) {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
+        this.messages.addAll(messages);
+        this.lastMessageAt = LocalDateTime.now();
+    }
+
+    public void clearMessages() {
+        if (this.messages != null) {
+            this.messages.clear();
+        }
+        this.lastMessageAt = null;
+        this.totalTokenCount = 0;
+    }
+
+    public List<Message> getMessages() {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
+        return this.messages;
+    }
 }
