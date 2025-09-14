@@ -1,21 +1,22 @@
 import { useEffect, useRef } from 'react'
+import type { Message } from './ChatMessage'
 import { ChatMessage } from './ChatMessage'
 import { ChatInput } from './ChatInput'
 import { ChatHeader } from './ChatHeader'
-import type { Message } from './ChatMessage'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sparkles } from 'lucide-react'
-import { useStartConversation, useSendMessage } from '@/net/query/chat'
+import { useSendMessage } from '@/net/query/chat'
 import {
-  useMessages,
-  useCurrentConversationId,
-  useConversationLoading,
   useAddMessage,
+  useConversationLoading,
+  useCurrentConversationId,
+  useMessages,
   useSetCurrentConversationId,
-  useSetLoading,
   useSetError,
+  useSetLoading,
 } from '@/stores/conversationStore'
+import { v4 as uuidv4 } from 'uuid'
 
 export function ChatInterface() {
   const messages = useMessages()
@@ -27,7 +28,6 @@ export function ChatInterface() {
   const setError = useSetError()
 
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const startConversationMutation = useStartConversation()
   const sendMessageMutation = useSendMessage()
 
   const scrollToBottom = () => {
@@ -62,19 +62,12 @@ export function ChatInterface() {
     setError(null)
 
     try {
-      let conversationId = currentConversationId
-
-      // Start new conversation if we don't have one
-      if (!conversationId) {
-        const conversationResponse =
-          await startConversationMutation.mutateAsync({
-            title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
-          })
-        conversationId = conversationResponse.conversationId
-        setCurrentConversationId(conversationId)
+      let conversationId = currentConversationId || uuidv4()
+      if (!currentConversationId) {
+        setCurrentConversationId(uuidv4())
       }
 
-      // Send message to the conversation
+      // Send a message to the conversation
       const response = await sendMessageMutation.mutateAsync({
         conversationId,
         request: { message: content },
@@ -84,7 +77,7 @@ export function ChatInterface() {
         id: (Date.now() + 1).toString(),
         content: response.response,
         role: 'assistant',
-        timestamp: new Date(),
+        timestamp: new Date().toString(),
       }
 
       addMessage(botMessage)
@@ -94,7 +87,7 @@ export function ChatInterface() {
         content:
           "Sorry, I'm having trouble connecting right now. Please try again.",
         role: 'assistant',
-        timestamp: new Date(),
+        timestamp: new Date().toString(),
       }
 
       addMessage(errorMessage)

@@ -2,23 +2,13 @@ import { MessageCircle, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProfileDropdown } from '@/components/common/ProfileDropdown'
 import { useStartNewConversation } from '@/stores/conversationStore'
-import { useStartConversation } from '@/net/query/chat'
+import { v4 as uuidv4 } from 'uuid'
 
 export function ChatHeader() {
   const startNewConversation = useStartNewConversation()
-  const startConversationMutation = useStartConversation()
 
   const handleNewConversation = async () => {
-    try {
-      const conversationResponse = await startConversationMutation.mutateAsync({
-        title: 'New Conversation',
-      })
-      startNewConversation(conversationResponse.conversationId)
-    } catch (error) {
-      console.error('Failed to create new conversation:', error)
-      // Fall back to local-only behavior
-      startNewConversation()
-    }
+    startNewConversation(uuidv4())
   }
 
   return (
@@ -29,11 +19,10 @@ export function ChatHeader() {
             variant="outline"
             size="sm"
             onClick={handleNewConversation}
-            disabled={startConversationMutation.isPending}
             className="gap-2 text-foreground"
           >
             <Plus className="size-4" />
-            {startConversationMutation.isPending ? 'Creating...' : 'New Chat'}
+            New Chat
           </Button>
         </div>
         <div className="flex items-center gap-3">

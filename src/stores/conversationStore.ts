@@ -21,14 +21,14 @@ interface ConversationState {
 
 const useConversationStore = create<ConversationState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       currentConversationId: null,
       messages: [
         {
           id: '1',
           content: "Hello! I'm your AI assistant. How can I help you today?",
           role: 'assistant',
-          timestamp: new Date(),
+          timestamp: new Date().toString(),
         },
       ],
       isLoading: false,
@@ -52,7 +52,7 @@ const useConversationStore = create<ConversationState>()(
               content:
                 "Hello! I'm your AI assistant. How can I help you today?",
               role: 'assistant',
-              timestamp: new Date(),
+              timestamp: new Date().toString(),
             },
           ],
         }),
@@ -66,7 +66,7 @@ const useConversationStore = create<ConversationState>()(
               content:
                 "Hello! I'm your AI assistant. How can I help you today?",
               role: 'assistant',
-              timestamp: new Date(),
+              timestamp: new Date().toString(),
             },
           ],
           error: null,
@@ -85,7 +85,7 @@ const useConversationStore = create<ConversationState>()(
               content:
                 "Hello! I'm your AI assistant. How can I help you today?",
               role: 'assistant',
-              timestamp: new Date(),
+              timestamp: new Date().toString(),
             },
           ],
           isLoading: false,

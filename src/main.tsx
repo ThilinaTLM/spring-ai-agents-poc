@@ -5,6 +5,7 @@ import Providers from '@/components/providers/Providers'
 import '@/styles.css'
 
 import { routeTree } from './routeTree.gen'
+
 const router = createRouter({ routeTree })
 
 const rootElement = document.getElementById('root')!

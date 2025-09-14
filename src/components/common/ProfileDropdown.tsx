@@ -1,4 +1,4 @@
-import { LogOut, Moon, Sun, User } from 'lucide-react'
+import { LogOut, Moon, Sun } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useAuthUser, useAuthActions } from '@/stores/authStore'
+import { useAuthActions, useAuthUser } from '@/stores/authStore'
 import { useTheme } from '@/components/providers/ThemeProvider'
 
 export function ProfileDropdown() {

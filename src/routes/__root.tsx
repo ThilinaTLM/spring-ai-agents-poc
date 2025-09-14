@@ -1,7 +1,7 @@
 import {
-  Scripts,
   createRootRouteWithContext,
   Link,
+  Scripts,
 } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 
