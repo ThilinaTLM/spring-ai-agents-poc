@@ -1,5 +1,7 @@
 package com.springagentpoc.api.service;
 
+import com.springagentpoc.api.ai.eval.EvaluationResult;
+import com.springagentpoc.api.ai.eval.Evaluator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -48,31 +50,64 @@ public class ChatService {
         ChatResponse chatResponse = chatModel.call(prompt);
         messages.add(chatResponse.getResult().getOutput());
 
-        while (chatResponse.hasToolCalls()) {
-            String toolId = chatResponse.getResult().getOutput().getToolCalls().get(0).id();
-            String toolName = chatResponse.getResult().getOutput().getToolCalls().get(0).name();
+        Evaluator evaluator = Evaluator.builder()
+                .chatModel(chatModel)
+                .userPrompt(userPrompt)
+                .build();
 
-            try {
-                ToolExecutionResult toolExecutionResult = toolCallingManager.executeToolCalls(prompt, chatResponse);
-                List<Message> toolExecutionResultMessages = toolExecutionResult.conversationHistory();
-                if (toolExecutionResultMessages.size() > messages.size()) {
-                    messages.addAll(toolExecutionResultMessages.subList(messages.size() + 1, toolExecutionResultMessages.size()));
+        while (!evaluator.hasReachedMaxIterations()) {
+            while (chatResponse.hasToolCalls()) {
+                String toolId = chatResponse.getResult().getOutput().getToolCalls().get(0).id();
+                String toolName = chatResponse.getResult().getOutput().getToolCalls().get(0).name();
+
+                try {
+                    ToolExecutionResult toolExecutionResult = toolCallingManager.executeToolCalls(prompt, chatResponse);
+                    List<Message> toolExecutionResultMessages = toolExecutionResult.conversationHistory();
+                    if (toolExecutionResultMessages.size() > messages.size()) {
+                        messages.addAll(toolExecutionResultMessages.subList(messages.size() + 1, toolExecutionResultMessages.size()));
+                    }
+
+                    prompt = new Prompt(messages, chatOptions);
+                    chatResponse = chatModel.call(prompt);
+                    messages.add(chatResponse.getResult().getOutput());
+                } catch (Exception e) {
+                    log.error("Error executing tool call: {}", e.getMessage(), e);
+                    String errorMessage = "You have got following error while executing the tool: " + e.getMessage();
+                    messages.add(new ToolResponseMessage(List.of(new ToolResponseMessage.ToolResponse(
+                            toolId, toolName,
+                            errorMessage
+                    ))));
+
+                    prompt = new Prompt(messages, chatOptions);
+                    chatResponse = chatModel.call(prompt);
+                    messages.add(chatResponse.getResult().getOutput());
                 }
+            }
 
-                prompt = new Prompt(messages, chatOptions);
-                chatResponse = chatModel.call(prompt);
-                messages.add(chatResponse.getResult().getOutput());
-            } catch (Exception e) {
-                log.error("Error executing tool call: {}", e.getMessage(), e);
-                String errorMessage = "You have got following error while executing the tool: " + e.getMessage();
-                messages.add(new ToolResponseMessage(List.of(new ToolResponseMessage.ToolResponse(
-                        toolId, toolName,
-                        errorMessage
-                ))));
+            EvaluationResult evaluationResult = evaluator.evaluate(messages);
+            switch (evaluationResult.getStatus()) {
+                case PASS -> {
+                    log.info("Response passed evaluation with score: {}", evaluationResult.getScore());
+                }
+                case NEEDS_IMPROVEMENT -> {
+                    log.info("Response needs improvement with score: {}", evaluationResult.getScore());
 
-                prompt = new Prompt(messages, chatOptions);
-                chatResponse = chatModel.call(prompt);
-                messages.add(chatResponse.getResult().getOutput());
+                    if (evaluator.hasReachedMaxIterations()) {
+                        messages.add(new UserMessage("The last response was rated as NEEDS_IMPROVEMENT. " +
+                                "However, the maximum number of improvement iterations has been reached. " +
+                                "Please provide the best possible response based on previous feedback: " + evaluationResult.getFeedback()));
+                    } else {
+                        messages.add(new UserMessage("The last response was rated as NEEDS_IMPROVEMENT. " +
+                                "Please improve it based on the following feedback: " + evaluationResult.getFeedback()));
+                    }
+                    prompt = new Prompt(messages, chatOptions);
+                    chatResponse = chatModel.call(prompt);
+                    messages.add(chatResponse.getResult().getOutput());
+                }
+                default -> {
+                    log.error("Unexpected evaluation status: {}", evaluationResult.getStatus());
+                    throw new IllegalStateException("Unexpected evaluation status: " + evaluationResult.getStatus());
+                }
             }
         }
 
