@@ -12,7 +12,6 @@ export function ChatInterface() {
   const { conversationId } = useParams({ from: '/chat/$conversationId' })
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-  // Use TanStack Query for state management
   const {
     data: messages = [],
     isLoading: isLoadingHistory,
@@ -45,12 +44,10 @@ export function ChatInterface() {
     try {
       await sendMessageMutation.mutateAsync({ message: content })
     } catch (error) {
-      // Error handling is done in the mutation's onError callback
       console.error('Failed to send message:', error)
     }
   }
 
-  // Show loading state while fetching conversation history
   if (isLoadingHistory) {
     return (
       <div className="w-full flex flex-col h-screen bg-background">
@@ -65,7 +62,6 @@ export function ChatInterface() {
     )
   }
 
-  // Show error state if conversation history failed to load
   if (historyError) {
     return (
       <div className="w-full flex flex-col h-screen bg-background">
@@ -74,7 +70,7 @@ export function ChatInterface() {
           <div className="text-center">
             <p className="text-destructive mb-2">Failed to load conversation</p>
             <p className="text-muted-foreground text-sm">
-              {historyError instanceof Error ? historyError.message : 'Unknown error'}
+              {historyError.message}
             </p>
           </div>
         </div>
@@ -143,7 +139,6 @@ export function ChatInterface() {
                         <div className="size-2 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:300ms]"></div>
                       </div>
                     </div>
-                    {/* Message tail */}
                     <div className="absolute top-4 -left-1 w-3 h-3 bg-card border-l border-b border-border transform rotate-45" />
                   </div>
                 </div>

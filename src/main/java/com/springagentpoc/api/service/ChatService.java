@@ -34,6 +34,21 @@ public class ChatService {
     private final SqlQueryService sqlQueryService;
     private final String systemPrompt;
 
+    public List<ChatMessageDto> getConversationHistory(UUID conversationId, UUID userId) {
+        log.debug("Retrieving conversation history for conversation: {}, user: {}", conversationId, userId);
+
+        if (chatMemory.conversationNotExists(conversationId)) {
+            return List.of();
+        }
+
+        List<Message> messages = chatMemory.getMessages(conversationId);
+
+        return messages.stream()
+                .filter(message -> !(message instanceof SystemMessage))
+                .map(ChatMessageDto::from)
+                .toList();
+    }
+
     public List<Message> chat(String userPrompt, UUID userId, UUID conversationId) {
         log.debug("Processing chat with memory for conversation: {}", conversationId);
 
@@ -122,18 +137,5 @@ public class ChatService {
         return newMessages;
     }
 
-    public List<ChatMessageDto> getConversationHistory(UUID conversationId, UUID userId) {
-        log.debug("Retrieving conversation history for conversation: {}, user: {}", conversationId, userId);
 
-        if (!chatMemory.conversationExists(conversationId)) {
-            return List.of();
-        }
-
-        List<Message> messages = chatMemory.getMessages(conversationId);
-
-        return messages.stream()
-                .filter(message -> !(message instanceof SystemMessage))
-                .map(ChatMessageDto::from)
-                .toList();
-    }
 }

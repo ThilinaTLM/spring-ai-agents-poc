@@ -85,7 +85,7 @@ public class ChatMessageDto {
         return new ChatMessageDto(
                 role,
                 message.getText(),
-                null,
+                message.getMetadata(),
                 toolCalls,
                 null,
                 toolResponses

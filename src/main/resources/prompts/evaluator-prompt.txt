@@ -9,7 +9,7 @@ Previous Evaluation Results (if any):
 {previous_evaluations}
 
 Evaluate the assistant's latest response considering:
-1. Whether it correctly and completely addresses the user's query
+1. Whether it correctly and completely addresses the user's query. Not an intermediate step.
 2. The appropriateness of any tool usage or technical elements
 3. The clarity and usefulness of the response
 4. Whether previous feedback has been incorporated (if applicable)
@@ -17,7 +17,7 @@ Evaluate the assistant's latest response considering:
 
 Based on previous evaluations, pay special attention to:
 - Recurring issues that haven't been addressed
-- Improvements made since last evaluation
+- Improvements made since the last evaluation
 - Patterns in the assistant's performance
 
 Respond ONLY with valid JSON in this exact format:

@@ -9,7 +9,7 @@ export function ChatHeader() {
 
   const handleNewConversation = async () => {
     const conversationId = uuidv4()
-    navigate({ to: '/chat/$conversationId', params: { conversationId } })
+    void navigate({ to: '/chat/$conversationId', params: { conversationId } })
   }
 
   return (
@@ -29,7 +29,7 @@ export function ChatHeader() {
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="size-10 bg-primary rounded-full flex items-center justify-center shadow-lg">
-              <MessageCircle className="size-5 text-white" />
+              <MessageCircle className="size-5 text-foreground" />
             </div>
             <div className="absolute -bottom-1 -right-1 size-4 bg-chart-4 border-2 border-background rounded-full animate-pulse" />
           </div>
