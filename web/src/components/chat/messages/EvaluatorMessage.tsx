@@ -35,8 +35,6 @@ export function EvaluatorMessage({ message }: EvaluatorMessageProps) {
             </p>
           </div>
 
-          {/* Message tail */}
-          <div className="absolute top-4 -left-1 w-3 h-3 bg-amber-50 border-l border-b border-amber-200 transform rotate-45 dark:bg-amber-950/20 dark:border-amber-800/30" />
         </div>
       </div>
     </div>

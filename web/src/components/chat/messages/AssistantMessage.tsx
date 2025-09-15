@@ -78,8 +78,6 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
             </div>
           )}
 
-          {/* Message tail */}
-          <div className="absolute top-4 -left-1 w-3 h-3 bg-card border-l border-b border-border transform rotate-45" />
         </div>
       </div>
     </div>

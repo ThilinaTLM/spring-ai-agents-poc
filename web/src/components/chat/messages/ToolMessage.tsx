@@ -202,8 +202,6 @@ export function ToolMessage({ message }: ToolMessageProps) {
             </div>
           )}
 
-          {/* Message tail */}
-          <div className="absolute top-4 -left-1 w-3 h-3 bg-accent/20 border-l border-b border-accent/30 transform rotate-45" />
         </div>
       </div>
     </div>

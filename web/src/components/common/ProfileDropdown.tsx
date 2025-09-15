@@ -10,11 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useAuthActions, useAuthUser } from '@/stores/authStore'
+import {
+  useAuthActions,
+  useAuthUser,
+  useAuthUserNameInitials,
+} from '@/stores/authStore'
 import { useTheme } from '@/components/providers/ThemeProvider'
 
 export function ProfileDropdown() {
   const user = useAuthUser()
+  const usernameInitials = useAuthUserNameInitials()
   const { logout } = useAuthActions()
   const { theme, setTheme } = useTheme()
 
@@ -24,11 +29,6 @@ export function ProfileDropdown() {
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light')
-  }
-
-  const getInitials = () => {
-    if (!user?.firstName) return 'U'
-    return user.firstName.charAt(0).toUpperCase()
   }
 
   const getFullName = () => {
@@ -41,7 +41,7 @@ export function ProfileDropdown() {
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
             <AvatarFallback className="bg-primary text-primary-foreground">
-              {getInitials()}
+              {usernameInitials}
             </AvatarFallback>
           </Avatar>
         </Button>
