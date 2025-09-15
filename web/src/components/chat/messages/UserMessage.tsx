@@ -7,7 +7,7 @@ interface UserMessageProps {
 }
 
 export function UserMessage({ message }: UserMessageProps) {
-  const userNameInitials = useAuthUserNameInitials();
+  const userNameInitials = useAuthUserNameInitials()
 
   return (
     <div className="flex gap-3 px-4 py-3 md:px-6 md:py-4 group/message animate-in fade-in slide-in-from-bottom-2 duration-300 flex-row-reverse">
