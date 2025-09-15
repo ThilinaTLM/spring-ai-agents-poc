@@ -34,7 +34,6 @@ export function EvaluatorMessage({ message }: EvaluatorMessageProps) {
               {message.content}
             </p>
           </div>
-
         </div>
       </div>
     </div>

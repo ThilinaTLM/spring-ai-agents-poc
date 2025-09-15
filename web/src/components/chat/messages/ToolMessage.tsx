@@ -201,7 +201,6 @@ export function ToolMessage({ message }: ToolMessageProps) {
               ))}
             </div>
           )}
-
         </div>
       </div>
     </div>

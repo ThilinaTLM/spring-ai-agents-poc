@@ -77,7 +77,6 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
               ))}
             </div>
           )}
-
         </div>
       </div>
     </div>

@@ -19,10 +19,13 @@ export const useSendMessage = (conversationId: string) => {
       })
       queryClient.setQueryData<ChatMessageDto[]>(
         ['conversation-history', conversationId],
-        (oldMessages) => [...(oldMessages || []), {
-          role: MessageRole.USER,
-          content: request.message,
-        }],
+        (oldMessages) => [
+          ...(oldMessages || []),
+          {
+            role: MessageRole.USER,
+            content: request.message,
+          },
+        ],
       )
     },
     onSettled: () => {
