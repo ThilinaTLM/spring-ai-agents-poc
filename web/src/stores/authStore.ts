@@ -41,7 +41,10 @@ export const useAuthUser = () => useAuthStore((state) => state.user)
 export const useAuthFullName = () =>
   useAuthStore((state) => `${state.user?.firstName} ${state.user?.lastName}`)
 export const useAuthUserNameInitials = () =>
-  useAuthStore((state) => `${state.user?.firstName?.charAt(0)}${state.user?.lastName?.charAt(0)}`)
+  useAuthStore(
+    (state) =>
+      `${state.user?.firstName?.charAt(0)}${state.user?.lastName?.charAt(0)}`,
+  )
 
 export const useIsAuthenticated = () =>
   useAuthStore((state) => state.token !== null)

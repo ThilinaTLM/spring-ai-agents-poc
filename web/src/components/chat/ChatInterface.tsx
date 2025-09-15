@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { ChatMessage } from './ChatMessage'
+import { GroupedChatMessage } from './GroupedChatMessage'
 import { ChatInput } from './ChatInput'
 import { ChatHeader } from './ChatHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -7,6 +8,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sparkles } from 'lucide-react'
 import { useGetConversationHistory, useSendMessage } from '@/net/query/chat'
 import { useParams } from '@tanstack/react-router'
+import {
+  groupChatMessages,
+  isMessageGroupable,
+} from '@/utils/groupChatMessages'
 
 export function ChatInterface() {
   const { conversationId } = useParams({ from: '/chat/$conversationId' })
@@ -105,15 +110,52 @@ export function ChatInterface() {
                 </div>
               </div>
             ) : (
-              messages.map((message, index) => (
-                <div
-                  key={`message-${index}`}
-                  className="animate-in fade-in slide-in-from-bottom-2 duration-500"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <ChatMessage message={message} />
-                </div>
-              ))
+              (() => {
+                // Check if messages can benefit from grouping
+                if (isMessageGroupable(messages)) {
+                  const { groupedMessages, remainingMessages } =
+                    groupChatMessages(messages)
+
+                  return (
+                    <>
+                      {/* Render grouped messages */}
+                      {groupedMessages.map((group, index) => (
+                        <div
+                          key={`group-${index}`}
+                          className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <GroupedChatMessage group={group} />
+                        </div>
+                      ))}
+
+                      {/* Render any remaining ungrouped messages */}
+                      {remainingMessages.map((message, index) => (
+                        <div
+                          key={`remaining-${index}`}
+                          className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+                          style={{
+                            animationDelay: `${(groupedMessages.length + index) * 100}ms`,
+                          }}
+                        >
+                          <ChatMessage message={message} />
+                        </div>
+                      ))}
+                    </>
+                  )
+                } else {
+                  // Fallback to original rendering for simple conversations
+                  return messages.map((message, index) => (
+                    <div
+                      key={`message-${index}`}
+                      className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <ChatMessage message={message} />
+                    </div>
+                  ))
+                }
+              })()
             )}
 
             {isLoading && (
