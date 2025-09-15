@@ -34,10 +34,7 @@ public class ChatService {
         log.debug("Processing chat with memory for conversation: {}", conversationId);
 
         ToolCallingManager toolCallingManager = DefaultToolCallingManager.builder().build();
-        ChatOptions chatOptions = ToolCallingChatOptions.builder()
-                .toolCallbacks(ToolCallbacks.from(sqlQueryService))
-                .internalToolExecutionEnabled(false)
-                .build();
+        ChatOptions chatOptions = ToolCallingChatOptions.builder().toolCallbacks(ToolCallbacks.from(sqlQueryService)).internalToolExecutionEnabled(false).build();
 
         chatMemory.createConversationIfNotExists(conversationId, userId, "New Conversation");
         List<Message> messages = chatMemory.getMessages(conversationId);
@@ -52,6 +49,9 @@ public class ChatService {
         messages.add(chatResponse.getResult().getOutput());
 
         while (chatResponse.hasToolCalls()) {
+            String toolId = chatResponse.getResult().getOutput().getToolCalls().get(0).id();
+            String toolName = chatResponse.getResult().getOutput().getToolCalls().get(0).name();
+
             try {
                 ToolExecutionResult toolExecutionResult = toolCallingManager.executeToolCalls(prompt, chatResponse);
                 List<Message> toolExecutionResultMessages = toolExecutionResult.conversationHistory();
@@ -64,9 +64,18 @@ public class ChatService {
                 messages.add(chatResponse.getResult().getOutput());
             } catch (Exception e) {
                 log.error("Error executing tool call: {}", e.getMessage(), e);
-                String errorMessage = "I encountered an error while trying to execute a tool. Error: " + e.getMessage();
-                messages.add(new ToolResponseMessage(List.of(new ToolResponseMessage.ToolResponse("", "", errorMessage))));
-                break;
+                String errorMessage = "You have got following error while executing the tool: " + e.getMessage();
+                messages.add(new ToolResponseMessage(List.of(new ToolResponseMessage.ToolResponse(
+                        toolId, toolName,
+                        errorMessage
+                ))));
+
+                String instructions = "Please try tool call again with correct parameters/queries if the error is on your end.";
+                messages.add(new UserMessage(instructions));
+
+                prompt = new Prompt(messages, chatOptions);
+                chatResponse = chatModel.call(prompt);
+                messages.add(chatResponse.getResult().getOutput());
             }
         }
 
