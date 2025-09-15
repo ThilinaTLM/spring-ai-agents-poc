@@ -1,6 +1,8 @@
 package com.springagentpoc.api.data.entity;
 
+import com.springagentpoc.api.data.embedded.ChatMessage;
 import com.springagentpoc.api.data.embedded.ConversationStatus;
+import com.springagentpoc.api.util.MessageConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +42,7 @@ public class Conversation {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "messages", columnDefinition = "jsonb")
-    private List<Message> messages = new ArrayList<>();
+    private List<ChatMessage> messages = new ArrayList<>();
 
     @Column(name = "total_token_count")
     private Integer totalTokenCount = 0;
@@ -64,11 +66,27 @@ public class Conversation {
         if (this.messages == null) {
             this.messages = new ArrayList<>();
         }
+        this.messages.add(MessageConverter.fromSpringAI(message));
+        this.lastMessageAt = LocalDateTime.now();
+    }
+
+    public void addChatMessage(ChatMessage message) {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
         this.messages.add(message);
         this.lastMessageAt = LocalDateTime.now();
     }
 
     public void addMessages(List<Message> messages) {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
+        this.messages.addAll(MessageConverter.fromSpringAIList(messages));
+        this.lastMessageAt = LocalDateTime.now();
+    }
+
+    public void addChatMessages(List<ChatMessage> messages) {
         if (this.messages == null) {
             this.messages = new ArrayList<>();
         }
@@ -85,6 +103,13 @@ public class Conversation {
     }
 
     public List<Message> getMessages() {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
+        return MessageConverter.toSpringAIList(this.messages);
+    }
+
+    public List<ChatMessage> getChatMessages() {
         if (this.messages == null) {
             this.messages = new ArrayList<>();
         }

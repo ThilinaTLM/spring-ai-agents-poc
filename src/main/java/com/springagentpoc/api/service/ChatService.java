@@ -1,6 +1,5 @@
 package com.springagentpoc.api.service;
 
-import com.springagentpoc.api.service.ChatMemoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
