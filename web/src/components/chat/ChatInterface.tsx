@@ -5,7 +5,7 @@ import { ChatHeader } from './ChatHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sparkles } from 'lucide-react'
-import { useSendMessage, useGetConversationHistory } from '@/net/query/chat'
+import { useGetConversationHistory, useSendMessage } from '@/net/query/chat'
 import { useParams } from '@tanstack/react-router'
 
 export function ChatInterface() {
@@ -87,7 +87,7 @@ export function ChatInterface() {
         <ScrollArea ref={scrollAreaRef} className="h-full">
           <div className="min-h-full pb-4">
             {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex items-center justify-center min-h-[calc(100vh-15rem)]">
                 <div className="text-center">
                   <div className="mb-4">
                     <Avatar className="size-16 mx-auto mb-4">
@@ -96,7 +96,9 @@ export function ChatInterface() {
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-foreground">Start a conversation</h3>
+                  <h3 className="text-lg font-semibold mb-2 text-foreground">
+                    Start a conversation
+                  </h3>
                   <p className="text-muted-foreground">
                     Type a message below to get started with your AI assistant.
                   </p>

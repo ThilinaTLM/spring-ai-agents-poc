@@ -10,7 +10,9 @@ export const useSendMessage = (conversationId: string) => {
       return await api.chat.sendMessage(conversationId, request)
     },
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ['conversation-history', conversationId] })
+      void queryClient.invalidateQueries({
+        queryKey: ['conversation-history', conversationId],
+      })
     },
   })
 }

@@ -23,7 +23,7 @@ export enum MessageRole {
   USER = 'USER',
   ASSISTANT = 'ASSISTANT',
   SYSTEM = 'SYSTEM',
-  TOOL = 'TOOL'
+  TOOL = 'TOOL',
 }
 
 export interface ChatToolCall {

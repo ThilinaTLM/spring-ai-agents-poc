@@ -17,7 +17,9 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
 
       <div className="flex flex-col max-w-[85%] md:max-w-[75%] lg:max-w-[65%] items-start">
         <div className="flex items-center gap-2 mb-1 px-1 flex-row">
-          <span className="font-semibold text-sm text-foreground">Assistant</span>
+          <span className="font-semibold text-sm text-foreground">
+            Assistant
+          </span>
           <span className="text-xs text-muted-foreground">
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: '2-digit',
@@ -41,10 +43,17 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           {/* Tool calls if present */}
           {message.toolCalls && message.toolCalls.length > 0 && (
             <div className="mt-3 space-y-2">
-              <div className="text-xs text-muted-foreground font-medium">Tool Calls:</div>
+              <div className="text-xs text-muted-foreground font-medium">
+                Tool Calls:
+              </div>
               {message.toolCalls.map((toolCall) => (
-                <div key={toolCall.id} className="bg-muted/30 rounded-lg p-2 border">
-                  <div className="text-xs font-medium text-foreground">{toolCall.name}</div>
+                <div
+                  key={toolCall.id}
+                  className="bg-muted/30 rounded-lg p-2 border"
+                >
+                  <div className="text-xs font-medium text-foreground">
+                    {toolCall.name}
+                  </div>
                   <div className="text-xs text-muted-foreground mt-1 font-mono">
                     {toolCall.arguments}
                   </div>
@@ -56,10 +65,17 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           {/* Tool responses if present */}
           {message.toolResponses && message.toolResponses.length > 0 && (
             <div className="mt-3 space-y-2">
-              <div className="text-xs text-muted-foreground font-medium">Tool Results:</div>
+              <div className="text-xs text-muted-foreground font-medium">
+                Tool Results:
+              </div>
               {message.toolResponses.map((response) => (
-                <div key={response.id} className="bg-muted/20 rounded-lg p-2 border">
-                  <div className="text-xs font-medium text-foreground">{response.name}</div>
+                <div
+                  key={response.id}
+                  className="bg-muted/20 rounded-lg p-2 border"
+                >
+                  <div className="text-xs font-medium text-foreground">
+                    {response.name}
+                  </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     {response.responseData}
                   </div>

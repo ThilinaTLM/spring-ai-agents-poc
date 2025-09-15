@@ -18,7 +18,9 @@ export function EvaluatorMessage({ message }: EvaluatorMessageProps) {
       <div className="flex flex-col max-w-[85%] md:max-w-[75%] lg:max-w-[65%] items-start">
         <div className="flex items-center gap-2 mb-1 px-1 flex-row">
           <AlertTriangle className="size-3 text-amber-600" />
-          <span className="font-semibold text-sm text-foreground">Evaluator Feedback</span>
+          <span className="font-semibold text-sm text-foreground">
+            Evaluator Feedback
+          </span>
           <span className="text-xs text-muted-foreground">
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: '2-digit',
