@@ -59,20 +59,6 @@ public class SqlQueryService {
                - created_at (TIMESTAMP): When transaction was created
                - updated_at (TIMESTAMP): When transaction was last updated
             
-            2. conversations table:
-               - id (UUID): Primary key
-               - title (VARCHAR): Conversation title
-               - created_at (TIMESTAMP): When conversation was created
-               - updated_at (TIMESTAMP): When conversation was last updated
-            
-            3. messages table:
-               - id (UUID): Primary key
-               - conversation_id (UUID): Foreign key to conversations
-               - role (VARCHAR): USER, ASSISTANT, SYSTEM
-               - content (TEXT): Message content
-               - content_hash (VARCHAR): SHA-256 hash of content
-               - created_at (TIMESTAMP): When message was created
-            
             Example Queries:
             - Total income: SELECT SUM(amount) FROM transactions WHERE type = 'CREDIT' AND status = 'COMPLETED'
             - Monthly spending: SELECT DATE_TRUNC('month', created_at) as month, SUM(amount) FROM transactions WHERE type = 'DEBIT' GROUP BY month
