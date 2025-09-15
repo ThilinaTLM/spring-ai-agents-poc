@@ -34,13 +34,15 @@ const useAuthStore = create<AuthStore>((set) => ({
 export const useSetSession = () => useAuthStore((state) => state.setSession)
 export const useClearSession = () => useAuthStore((state) => state.clearSession)
 export const useSetKeycloak = () => useAuthStore((state) => state.setKeycloak)
-
-export const getAuthUser = () => useAuthStore.getState().user
 export const getAuthToken = () => useAuthStore.getState().token
 
 export const useAuthUser = () => useAuthStore((state) => state.user)
+
 export const useAuthFullName = () =>
   useAuthStore((state) => `${state.user?.firstName} ${state.user?.lastName}`)
+export const useAuthUserNameInitials = () =>
+  useAuthStore((state) => `${state.user?.firstName?.charAt(0)}${state.user?.lastName?.charAt(0)}`)
+
 export const useIsAuthenticated = () =>
   useAuthStore((state) => state.token !== null)
 

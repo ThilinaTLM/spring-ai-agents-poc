@@ -1,29 +1,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ChatMessageDto } from '@/net/api/types/chat'
+import { useAuthUserNameInitials } from '@/stores/authStore.ts'
 
 interface UserMessageProps {
   message: ChatMessageDto
 }
 
 export function UserMessage({ message }: UserMessageProps) {
+  const userNameInitials = useAuthUserNameInitials();
+
   return (
     <div className="flex gap-3 px-4 py-3 md:px-6 md:py-4 group/message animate-in fade-in slide-in-from-bottom-2 duration-300 flex-row-reverse">
       <Avatar className="size-8 md:size-9 shrink-0 transition-transform duration-200 hover:scale-105 ml-2">
         <AvatarImage src={undefined} alt="User" />
         <AvatarFallback className="text-xs font-semibold transition-colors duration-200 bg-chart-2 text-background shadow-lg">
-          U
+          {userNameInitials}
         </AvatarFallback>
       </Avatar>
 
       <div className="flex flex-col max-w-[85%] md:max-w-[75%] lg:max-w-[65%] items-end">
         <div className="flex items-center gap-2 mb-1 px-1 flex-row-reverse">
           <span className="font-semibold text-sm text-foreground">You</span>
-          <span className="text-xs text-muted-foreground">
-            {new Date(message.timestamp).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
         </div>
 
         <div

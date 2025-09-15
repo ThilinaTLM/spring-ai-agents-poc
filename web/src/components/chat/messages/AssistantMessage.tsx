@@ -20,12 +20,6 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           <span className="font-semibold text-sm text-foreground">
             Assistant
           </span>
-          <span className="text-xs text-muted-foreground">
-            {new Date(message.timestamp).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
         </div>
 
         <div

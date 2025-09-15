@@ -1,20 +1,3 @@
-export type ChatExperimentFormDto = {
-  prompt: string
-}
-
-export type ChatExperimentDto = {
-  response: string
-  timestamp: string
-}
-
-export type StartConversationFormDto = {
-  title: string
-}
-
-export type ConversationDto = {
-  conversationId: string
-}
-
 export type ChatMessageFormDto = {
   message: string
 }
@@ -46,10 +29,8 @@ export interface ChatMedia {
 }
 
 export interface ChatMessageDto {
-  id?: string
   role: MessageRole
   content: string
-  timestamp: string
   metadata?: Record<string, any>
   toolCalls?: ChatToolCall[]
   media?: ChatMedia[]

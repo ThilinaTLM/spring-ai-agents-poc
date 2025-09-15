@@ -13,12 +13,6 @@ export function SystemMessage({ message }: SystemMessageProps) {
         <span className="text-xs text-muted-foreground font-medium">
           {message.content}
         </span>
-        <span className="text-xs text-muted-foreground/70">
-          {new Date(message.timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </span>
       </div>
     </div>
   )
