@@ -2,15 +2,8 @@ package com.springagentpoc.api.data.embedded;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
-@Data
-public class ChatToolCall {
-    private final String id;
-    private final String type;
-    private final String name;
-    private final String arguments;
-
+public record ChatToolCall(String id, String type, String name, String arguments) {
     @JsonCreator
     public ChatToolCall(
             @JsonProperty("id") String id,

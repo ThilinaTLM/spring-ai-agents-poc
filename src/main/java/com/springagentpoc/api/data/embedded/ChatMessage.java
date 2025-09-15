@@ -2,22 +2,14 @@ package com.springagentpoc.api.data.embedded;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-public class ChatMessage {
-    private final MessageRole role;
-    private final String content;
-    private final Map<String, Object> metadata;
-    private final List<ChatToolCall> toolCalls;
-    private final List<ChatMedia> media;
-    private final List<ChatToolResponse> toolResponses;
-
+public record ChatMessage(MessageRole role, String content, Map<String, Object> metadata, List<ChatToolCall> toolCalls,
+                          List<ChatMedia> media, List<ChatToolResponse> toolResponses) {
     @JsonCreator
     public ChatMessage(
             @JsonProperty("role") MessageRole role,

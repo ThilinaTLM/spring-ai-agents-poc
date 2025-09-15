@@ -61,7 +61,7 @@ public class MessageConverter {
     }
 
     public static Message toSpringAI(ChatMessage chatMessage) {
-        return switch (chatMessage.getRole()) {
+        return switch (chatMessage.role()) {
             case USER -> createUserMessage(chatMessage);
             case ASSISTANT -> createAssistantMessage(chatMessage);
             case SYSTEM -> createSystemMessage(chatMessage);
@@ -99,11 +99,11 @@ public class MessageConverter {
 
     private static UserMessage createUserMessage(ChatMessage chatMessage) {
         UserMessage.Builder builder = UserMessage.builder()
-                .text(chatMessage.getContent())
-                .metadata(chatMessage.getMetadata());
+                .text(chatMessage.content())
+                .metadata(chatMessage.metadata());
 
-        if (!chatMessage.getMedia().isEmpty()) {
-            List<Media> media = chatMessage.getMedia().stream()
+        if (!chatMessage.media().isEmpty()) {
+            List<Media> media = chatMessage.media().stream()
                     .map(MessageConverter::convertToChatMedia)
                     .collect(Collectors.toList());
             builder.media(media);
@@ -113,17 +113,17 @@ public class MessageConverter {
     }
 
     private static AssistantMessage createAssistantMessage(ChatMessage chatMessage) {
-        List<AssistantMessage.ToolCall> toolCalls = chatMessage.getToolCalls().stream()
-                .map(tc -> new AssistantMessage.ToolCall(tc.getId(), tc.getType(), tc.getName(), tc.getArguments()))
+        List<AssistantMessage.ToolCall> toolCalls = chatMessage.toolCalls().stream()
+                .map(tc -> new AssistantMessage.ToolCall(tc.id(), tc.type(), tc.name(), tc.arguments()))
                 .collect(Collectors.toList());
 
-        List<Media> media = chatMessage.getMedia().stream()
+        List<Media> media = chatMessage.media().stream()
                 .map(MessageConverter::convertToChatMedia)
                 .collect(Collectors.toList());
 
         return new AssistantMessage(
-                chatMessage.getContent(),
-                chatMessage.getMetadata(),
+                chatMessage.content(),
+                chatMessage.metadata(),
                 toolCalls,
                 media
         );
@@ -131,17 +131,17 @@ public class MessageConverter {
 
     private static SystemMessage createSystemMessage(ChatMessage chatMessage) {
         return SystemMessage.builder()
-                .text(chatMessage.getContent())
-                .metadata(chatMessage.getMetadata())
+                .text(chatMessage.content())
+                .metadata(chatMessage.metadata())
                 .build();
     }
 
     private static ToolResponseMessage createToolResponseMessage(ChatMessage chatMessage) {
-        List<ToolResponseMessage.ToolResponse> responses = chatMessage.getToolResponses().stream()
-                .map(tr -> new ToolResponseMessage.ToolResponse(tr.getId(), tr.getName(), tr.getResponseData()))
+        List<ToolResponseMessage.ToolResponse> responses = chatMessage.toolResponses().stream()
+                .map(tr -> new ToolResponseMessage.ToolResponse(tr.id(), tr.name(), tr.responseData()))
                 .collect(Collectors.toList());
 
-        return new ToolResponseMessage(responses, chatMessage.getMetadata());
+        return new ToolResponseMessage(responses, chatMessage.metadata());
     }
 
     public static List<ChatMessage> fromSpringAIList(List<Message> messages) {

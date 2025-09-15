@@ -36,12 +36,12 @@ public class ChatMessageDto {
 
     public static ChatMessageDto from(ChatMessage message) {
         return new ChatMessageDto(
-                message.getRole(),
-                message.getContent(),
-                message.getMetadata(),
-                message.getToolCalls(),
-                message.getMedia(),
-                message.getToolResponses()
+                message.role(),
+                message.content(),
+                message.metadata(),
+                message.toolCalls(),
+                message.media(),
+                message.toolResponses()
         );
     }
 
