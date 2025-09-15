@@ -1,5 +1,6 @@
 package com.springagentpoc.api.service;
 
+import com.springagentpoc.api.models.dto.ChatMessageDto;
 import com.springagentpoc.api.util.eval.EvaluationResult;
 import com.springagentpoc.api.util.eval.Evaluator;
 import lombok.RequiredArgsConstructor;
@@ -89,38 +90,50 @@ public class ChatService {
             }
 
             EvaluationResult evaluationResult = evaluator.evaluate(messages);
-            switch (evaluationResult.getStatus()) {
-                case PASS -> {
-                    log.info("Response passed evaluation with score: {}", evaluationResult.getScore());
-                }
-                case NEEDS_IMPROVEMENT -> {
-                    log.info("Response needs improvement with score: {}", evaluationResult.getScore());
+            if (evaluationResult.getStatus() == EvaluationResult.EvaluationStatus.PASS) {
+                log.info("Response passed evaluation with score: {}", evaluationResult.getScore());
+                break;
+            } else if (evaluationResult.getStatus() == EvaluationResult.EvaluationStatus.NEEDS_IMPROVEMENT) {
+                log.info("Response needs improvement with score: {}", evaluationResult.getScore());
 
-                    String feedbackPromptMessage = evaluator.hasReachedMaxIterations() ?
-                            "The last response was rated as NEEDS_IMPROVEMENT. " +
-                                    "However, the maximum number of improvement iterations has been reached. " +
-                                    "Please provide the best possible response based on previous feedback: " + evaluationResult.getFeedback() :
-                            "The last response was rated as NEEDS_IMPROVEMENT. " +
-                                    "Please improve it based on the following feedback: " + evaluationResult.getFeedback();
+                String feedbackPromptMessage = evaluator.hasReachedMaxIterations() ?
+                        "The last response was rated as NEEDS_IMPROVEMENT. " +
+                                "However, the maximum number of improvement iterations has been reached. " +
+                                "Please provide the best possible response based on previous feedback: " + evaluationResult.getFeedback() :
+                        "The last response was rated as NEEDS_IMPROVEMENT. " +
+                                "Please improve it based on the following feedback: " + evaluationResult.getFeedback();
 
-                    messages.add(UserMessage.builder()
-                            .text(feedbackPromptMessage)
-                            .metadata(Map.of("source", "evaluator"))
-                            .build());
+                messages.add(UserMessage.builder()
+                        .text(feedbackPromptMessage)
+                        .metadata(Map.of("source", "evaluator"))
+                        .build());
 
-                    prompt = new Prompt(messages, chatOptions);
-                    chatResponse = chatModel.call(prompt);
-                    messages.add(chatResponse.getResult().getOutput());
-                }
-                default -> {
-                    log.error("Unexpected evaluation status: {}", evaluationResult.getStatus());
-                    throw new IllegalStateException("Unexpected evaluation status: " + evaluationResult.getStatus());
-                }
+                prompt = new Prompt(messages, chatOptions);
+                chatResponse = chatModel.call(prompt);
+                messages.add(chatResponse.getResult().getOutput());
+            } else {
+                log.error("Unexpected evaluation status: {}", evaluationResult.getStatus());
+                throw new IllegalStateException("Unexpected evaluation status: " + evaluationResult.getStatus());
             }
         }
 
         List<Message> newMessages = messages.subList(chatMemoryInitialSize, messages.size());
         chatMemory.addMessages(conversationId, newMessages);
         return newMessages;
+    }
+
+    public List<ChatMessageDto> getConversationHistory(UUID conversationId, UUID userId) {
+        log.debug("Retrieving conversation history for conversation: {}, user: {}", conversationId, userId);
+
+        if (!chatMemory.conversationExists(conversationId)) {
+            return List.of();
+        }
+
+        List<Message> messages = chatMemory.getMessages(conversationId);
+
+        return messages.stream()
+                .filter(message -> !(message instanceof SystemMessage))
+                .map(ChatMessageDto::from)
+                .toList();
     }
 }

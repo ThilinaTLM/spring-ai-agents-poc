@@ -1,14 +1,15 @@
 import { MessageCircle, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProfileDropdown } from '@/components/common/ProfileDropdown'
-import { useStartNewConversation } from '@/stores/conversationStore'
+import { useNavigate } from '@tanstack/react-router'
 import { v4 as uuidv4 } from 'uuid'
 
 export function ChatHeader() {
-  const startNewConversation = useStartNewConversation()
+  const navigate = useNavigate()
 
   const handleNewConversation = async () => {
-    startNewConversation(uuidv4())
+    const conversationId = uuidv4()
+    navigate({ to: '/chat/$conversationId', params: { conversationId } })
   }
 
   return (

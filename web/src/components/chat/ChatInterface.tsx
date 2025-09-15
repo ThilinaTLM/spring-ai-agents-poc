@@ -1,34 +1,26 @@
 import { useEffect, useRef } from 'react'
-import type { Message } from './ChatMessage'
 import { ChatMessage } from './ChatMessage'
 import { ChatInput } from './ChatInput'
 import { ChatHeader } from './ChatHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sparkles } from 'lucide-react'
-import { useSendMessage } from '@/net/query/chat'
-import {
-  useAddMessage,
-  useConversationLoading,
-  useCurrentConversationId,
-  useMessages,
-  useSetCurrentConversationId,
-  useSetError,
-  useSetLoading,
-} from '@/stores/conversationStore'
-import { v4 as uuidv4 } from 'uuid'
+import { useSendMessage, useGetConversationHistory } from '@/net/query/chat'
+import { useParams } from '@tanstack/react-router'
 
 export function ChatInterface() {
-  const messages = useMessages()
-  const currentConversationId = useCurrentConversationId()
-  const isLoading = useConversationLoading()
-  const addMessage = useAddMessage()
-  const setCurrentConversationId = useSetCurrentConversationId()
-  const setLoading = useSetLoading()
-  const setError = useSetError()
-
+  const { conversationId } = useParams({ from: '/chat/$conversationId' })
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const sendMessageMutation = useSendMessage()
+
+  // Use TanStack Query for state management
+  const {
+    data: messages = [],
+    isLoading: isLoadingHistory,
+    error: historyError,
+  } = useGetConversationHistory(conversationId)
+
+  const sendMessageMutation = useSendMessage(conversationId)
+  const isLoading = sendMessageMutation.isPending
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -50,51 +42,44 @@ export function ChatInterface() {
   }, [messages, isLoading])
 
   const handleSendMessage = async (content: string) => {
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content,
-      role: 'user',
-      timestamp: new Date().toString(),
-    }
-
-    addMessage(userMessage)
-    setLoading(true)
-    setError(null)
-
     try {
-      let conversationId = currentConversationId || uuidv4()
-      if (!currentConversationId) {
-        setCurrentConversationId(uuidv4())
-      }
-
-      // Send a message to the conversation
-      const response = await sendMessageMutation.mutateAsync({
-        conversationId,
-        request: { message: content },
-      })
-
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: response.response,
-        role: 'assistant',
-        timestamp: new Date().toString(),
-      }
-
-      addMessage(botMessage)
+      await sendMessageMutation.mutateAsync({ message: content })
     } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content:
-          "Sorry, I'm having trouble connecting right now. Please try again.",
-        role: 'assistant',
-        timestamp: new Date().toString(),
-      }
-
-      addMessage(errorMessage)
-      setError('Failed to send message')
-    } finally {
-      setLoading(false)
+      // Error handling is done in the mutation's onError callback
+      console.error('Failed to send message:', error)
     }
+  }
+
+  // Show loading state while fetching conversation history
+  if (isLoadingHistory) {
+    return (
+      <div className="w-full flex flex-col h-screen bg-background">
+        <ChatHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading conversation...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state if conversation history failed to load
+  if (historyError) {
+    return (
+      <div className="w-full flex flex-col h-screen bg-background">
+        <ChatHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-destructive mb-2">Failed to load conversation</p>
+            <p className="text-muted-foreground text-sm">
+              {historyError instanceof Error ? historyError.message : 'Unknown error'}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -105,15 +90,33 @@ export function ChatInterface() {
       <div className="w-full max-w-7xl mx-auto flex-1 overflow-hidden">
         <ScrollArea ref={scrollAreaRef} className="h-full">
           <div className="min-h-full pb-4">
-            {messages.map((message, index) => (
-              <div
-                key={message.id}
-                className="animate-in fade-in slide-in-from-bottom-2 duration-500"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <ChatMessage message={message} />
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="mb-4">
+                    <Avatar className="size-16 mx-auto mb-4">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+                        AI
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 text-foreground">Start a conversation</h3>
+                  <p className="text-muted-foreground">
+                    Type a message below to get started with your AI assistant.
+                  </p>
+                </div>
               </div>
-            ))}
+            ) : (
+              messages.map((message, index) => (
+                <div
+                  key={`message-${index}`}
+                  className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <ChatMessage message={message} />
+                </div>
+              ))
+            )}
 
             {isLoading && (
               <div className="flex gap-3 px-4 py-3 md:px-6 md:py-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -153,7 +156,7 @@ export function ChatInterface() {
       {/* Input Area */}
       <ChatInput
         onSendMessage={handleSendMessage}
-        disabled={isLoading}
+        disabled={isLoading || isLoadingHistory}
         placeholder={isLoading ? 'AI is typing...' : 'Type your message...'}
       />
     </div>

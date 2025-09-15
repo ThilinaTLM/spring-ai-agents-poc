@@ -42,4 +42,17 @@ public class ChatController {
         );
         return ResponseEntity.ok(messages.stream().map(ChatMessageDto::from).toList());
     }
+
+    @GetMapping("/conversation/{conversationId}/messages")
+    @Operation(
+            summary = "Get conversation history",
+            description = "Retrieve all messages from a conversation, excluding system prompts."
+    )
+    public ResponseEntity<List<ChatMessageDto>> getConversationHistory(
+            @UserId UUID userId,
+            @PathVariable UUID conversationId
+    ) {
+        List<ChatMessageDto> messages = chatService.getConversationHistory(conversationId, userId);
+        return ResponseEntity.ok(messages);
+    }
 }
