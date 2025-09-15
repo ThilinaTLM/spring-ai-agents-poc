@@ -70,9 +70,6 @@ public class ChatService {
                         errorMessage
                 ))));
 
-                String instructions = "Please try tool call again with correct parameters/queries if the error is on your end.";
-                messages.add(new UserMessage(instructions));
-
                 prompt = new Prompt(messages, chatOptions);
                 chatResponse = chatModel.call(prompt);
                 messages.add(chatResponse.getResult().getOutput());
