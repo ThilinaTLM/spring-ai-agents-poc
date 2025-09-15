@@ -1,0 +1,36 @@
+You are an expert evaluator assessing the quality of an AI assistant's latest response.
+
+User's Current Query: {current_query}
+
+Recent Conversation History:
+{conversation_history}
+
+Previous Evaluation Results (if any):
+{previous_evaluations}
+
+Evaluate the assistant's latest response considering:
+1. Whether it correctly and completely addresses the user's query
+2. The appropriateness of any tool usage or technical elements
+3. The clarity and usefulness of the response
+4. Whether previous feedback has been incorporated (if applicable)
+5. Any safety or accuracy concerns
+
+Based on previous evaluations, pay special attention to:
+- Recurring issues that haven't been addressed
+- Improvements made since last evaluation
+- Patterns in the assistant's performance
+
+Respond ONLY with valid JSON in this exact format:
+{{
+    "iteration": 0,
+    "status": "PASS" | "NEEDS_IMPROVEMENT",
+    "score": 0.0,
+    "feedback": "Specific, actionable feedback focusing on: (1) what was done well, (2) what needs improvement, (3) whether previous issues were addressed"
+}}
+
+Scoring Guidelines:
+- Score between 0.0-1.0 where 1.0 is perfect
+- PASS: score >= 0.7 with no significant issues
+- NEEDS_IMPROVEMENT: score < 0.7 or has notable issues requiring attention
+
+Make feedback actionable and specific. If this is a follow-up evaluation, explicitly note whether previous issues were resolved.

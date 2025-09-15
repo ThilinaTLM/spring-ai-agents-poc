@@ -9,9 +9,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,16 +30,16 @@ public class ChatController {
             summary = "Send message with memory",
             description = "Send a message to a conversation. If the conversation doesn't exist, it will be created automatically."
     )
-    public ResponseEntity<ChatMessageDto> sendMessage(
+    public ResponseEntity<List<ChatMessageDto>> sendMessage(
             @UserId UUID userId,
             @PathVariable UUID conversationId,
             @Valid @RequestBody ChatMessageFormDto request
     ) {
-        String response = chatService.chat(
+        List<Message> messages = chatService.chat(
                 request.getMessage(),
                 userId,
                 conversationId
         );
-        return ResponseEntity.ok(new ChatMessageDto(response));
+        return ResponseEntity.ok(messages.stream().map(ChatMessageDto::from).toList());
     }
 }

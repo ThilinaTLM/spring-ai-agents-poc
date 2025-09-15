@@ -28,7 +28,21 @@ public class PromptConfig {
         } catch (IOException e) {
             log.error("Failed to load system prompt from file: {}, falling back to default",
                     promptProperties.getSystemPromptPath(), e);
-            return promptProperties.getFallbackPrompt();
+            throw new IllegalStateException("Failed to load system prompt from file: " + promptProperties.getSystemPromptPath(), e);
+        }
+    }
+
+    @Bean
+    public String evaluatorPrompt() {
+        try {
+            var resource = resourceLoader.getResource(promptProperties.getEvaluatorPromptPath());
+            String prompt = resource.getContentAsString(StandardCharsets.UTF_8);
+            log.info("Successfully loaded assistant prompt from: {}", promptProperties.getEvaluatorPromptPath());
+            return prompt;
+        } catch (IOException e) {
+            log.error("Failed to load assistant prompt from file: {}, falling back to default",
+                    promptProperties.getEvaluatorPromptPath(), e);
+            throw new IllegalStateException("Failed to load assistant prompt from file: " + promptProperties.getEvaluatorPromptPath(), e);
         }
     }
 }

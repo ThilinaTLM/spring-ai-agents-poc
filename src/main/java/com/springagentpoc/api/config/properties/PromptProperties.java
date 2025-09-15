@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "prompt")
 public class PromptProperties {
 
-    private String systemPromptPath = "classpath:prompts/finance-guard-system-prompt.txt";
+    private String systemPromptPath = "classpath:prompts/system-prompt.txt";
+    private String evaluatorPromptPath = "classpath:prompts/evaluator-prompt.txt";
 
     private String fallbackPrompt = "You are FinanceGuard, a professional personal financial advisor and transaction analyst.";
 }

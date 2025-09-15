@@ -20,6 +20,7 @@ import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -32,7 +33,7 @@ public class ChatService {
     private final SqlQueryService sqlQueryService;
     private final String systemPrompt;
 
-    public String chat(String userPrompt, UUID userId, UUID conversationId) {
+    public List<Message> chat(String userPrompt, UUID userId, UUID conversationId) {
         log.debug("Processing chat with memory for conversation: {}", conversationId);
 
         ToolCallingManager toolCallingManager = DefaultToolCallingManager.builder().build();
@@ -45,7 +46,10 @@ public class ChatService {
             messages.add(new SystemMessage(systemPrompt));
         }
 
-        messages.add(new UserMessage(userPrompt));
+        messages.add(UserMessage.builder()
+                .text(userPrompt)
+                .metadata(Map.of("source", "user"))
+                .build());
         Prompt prompt = new Prompt(messages, chatOptions);
         ChatResponse chatResponse = chatModel.call(prompt);
         messages.add(chatResponse.getResult().getOutput());
@@ -92,14 +96,18 @@ public class ChatService {
                 case NEEDS_IMPROVEMENT -> {
                     log.info("Response needs improvement with score: {}", evaluationResult.getScore());
 
-                    if (evaluator.hasReachedMaxIterations()) {
-                        messages.add(new UserMessage("The last response was rated as NEEDS_IMPROVEMENT. " +
-                                "However, the maximum number of improvement iterations has been reached. " +
-                                "Please provide the best possible response based on previous feedback: " + evaluationResult.getFeedback()));
-                    } else {
-                        messages.add(new UserMessage("The last response was rated as NEEDS_IMPROVEMENT. " +
-                                "Please improve it based on the following feedback: " + evaluationResult.getFeedback()));
-                    }
+                    String feedbackPromptMessage = evaluator.hasReachedMaxIterations() ?
+                            "The last response was rated as NEEDS_IMPROVEMENT. " +
+                                    "However, the maximum number of improvement iterations has been reached. " +
+                                    "Please provide the best possible response based on previous feedback: " + evaluationResult.getFeedback() :
+                            "The last response was rated as NEEDS_IMPROVEMENT. " +
+                                    "Please improve it based on the following feedback: " + evaluationResult.getFeedback();
+
+                    messages.add(UserMessage.builder()
+                            .text(feedbackPromptMessage)
+                            .metadata(Map.of("source", "evaluator"))
+                            .build());
+
                     prompt = new Prompt(messages, chatOptions);
                     chatResponse = chatModel.call(prompt);
                     messages.add(chatResponse.getResult().getOutput());
@@ -111,7 +119,8 @@ public class ChatService {
             }
         }
 
-        chatMemory.addMessages(conversationId, messages.subList(chatMemoryInitialSize, messages.size()));
-        return messages.get(messages.size() - 1).getText();
+        List<Message> newMessages = messages.subList(chatMemoryInitialSize, messages.size());
+        chatMemory.addMessages(conversationId, newMessages);
+        return newMessages;
     }
 }
