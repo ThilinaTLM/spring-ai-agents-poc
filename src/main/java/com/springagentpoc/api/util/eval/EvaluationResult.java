@@ -1,4 +1,4 @@
-package com.springagentpoc.api.ai.eval;
+package com.springagentpoc.api.util.eval;
 
 import lombok.Data;
 
